@@ -1,0 +1,23 @@
+# Python/Django
+__pycache__/
+*.py[cod]
+env/
+static/
+media/
+.env
+dump.rdb
+requirements.flag
+
+# Node/ReactJS
+build/
+node_modules/
+coverage
+stats.json
+npm-debug.log
+
+# Misc.
+.DS_Store
+.idea
+*.swp
+
+\.vscode/settings\.json

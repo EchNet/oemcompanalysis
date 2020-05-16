@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}404 Not Found{% endblock %}
+
+{% block content %}
+  <div class="container push-top col-sm-8 offset-sm-2 text-center" style="padding-top: 80px;">
+    <h1>404</h1>
+    <p>This page doesn't exist. Try the <a href="{% url 'home'%}">home page.</a></p>
+  </div>
+{% endblock content %}

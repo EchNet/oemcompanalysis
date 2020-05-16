@@ -1,0 +1,27 @@
+# Required python modules.
+
+Django
+boto3
+celery[redis]
+celery-redbeat
+django-celery-email
+django-cors-headers
+django-extensions
+django-import-export
+django-localflavor
+django-object-actions
+django-rest-swagger
+django-storages
+django-widget-tweaks
+djangorestframework
+djangorestframework-jwt
+dj-database-url
+gunicorn
+psycopg2-binary
+python-decouple
+python-dotenv
+python-jose
+raven
+social-auth-app-django
+wheel
+whitenoise
