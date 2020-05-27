@@ -25,3 +25,4 @@ raven
 social-auth-app-django
 wheel
 whitenoise
+yapf
