@@ -20,8 +20,6 @@ STAGING = config("STAGING", cast=bool, default=False)
 DEMO = config("DEMO", cast=bool, default=False)
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 SITE_URL = config("SITE_URL")
-ENV = config("ENV")
-ENV_COLOR = config("ENV_COLOR")
 ALLOWED_HOSTS = ["*"]
 
 # Web server
@@ -81,7 +79,10 @@ DATABASES = {"default": config("DATABASE_URL", cast=db_url)}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = 60
 
-# Auth
+# Authentication
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
+LOGIN_ERROR_URL = "/login-error/"
 SECRET_KEY = config("SECRET_KEY")
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -102,8 +103,11 @@ AUTH_PASSWORD_VALIDATORS = [
                  ".NumericPasswordValidator")
     },
 ]
-# Password reset parameters.
-PASSWORD_RESET_TIMEOUT_DAYS = 3
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.facebook.FacebookOAuth2",
+    "social_core.backends.facebook.FacebookAppOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
@@ -173,6 +177,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "djmain.context_processors.context_settings",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -240,3 +247,21 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
+
+# Social Auth
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
+SOCIAL_AUTH_FACEBOOK_KEY = config("SOCIAL_AUTH_FACEBOOK_KEY", default="")
+SOCIAL_AUTH_FACEBOOK_SECRET = config("SOCIAL_AUTH_FACEBOOK_SECRET", default="")
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.user.create_user",
+    "djmain.social_auth.trace",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True

@@ -4,7 +4,8 @@
 
 {% block content %}
   <div class="container push-top col-sm-8 offset-sm-2 text-center" style="padding-top: 80px;">
-    <h1>Home</h1>
-    <p>How are we doing so far, {{ user.first_name }}?</p>
+    <h1>Login</h1>
+    <p>Here are your choices.</p>
+    <p><a href="{% url "social:begin" "facebook" %}">Login with Facebook</a></p>
   </div>
 {% endblock content %}
