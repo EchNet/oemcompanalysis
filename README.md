@@ -29,3 +29,12 @@ Deployment on Heroku so we spend less time on devops and more on application dev
 See the Makefile.
 
 Python code format: There is a yapf style file checked in at .style.yapf in the root folder.
+
+## First Deploy to Heroku
+
+* Create the Heroku app.
+* Create the remote.
+* Add postgres addon through command line.
+* Add redis addon through command line.
+* Add initial env var settings (script TBD).
+* Push.
