@@ -5,6 +5,7 @@ from django.conf import settings
 from django.urls import include, path
 from django.views.generic import TemplateView
 
+import api
 import djmain.views as views
 
 urlpatterns = [
@@ -15,6 +16,7 @@ urlpatterns = [
          name="login-error"),
     path("", include("social_django.urls")),
     path("admin/", admin.site.urls),
+    path("api/1.0/", include("api.urls")),
 ]
 
 if settings.SERVE_MEDIA:
