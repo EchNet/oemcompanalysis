@@ -9,7 +9,8 @@ dump.rdb
 requirements.flag
 
 # Node/ReactJS
-build/
+.cache/
+dist/
 node_modules/
 coverage
 stats.json

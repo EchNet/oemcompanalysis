@@ -37,4 +37,5 @@ Python code format: There is a yapf style file checked in at .style.yapf in the 
 * Add postgres addon through command line.
 * Add redis addon through command line.
 * Add initial env var settings (script TBD).
+* Add django and node buildpacks.
 * Push.

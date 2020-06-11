@@ -148,20 +148,22 @@ LOGGING = {
 # SSL
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool, default=True)
 
-# Static file
+# Static files
 SERVE_MEDIA = DEBUG
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(SITE_ROOT, "media")
 
-STATIC_DEV = os.path.join(SITE_ROOT, "static_dev")
-STATICFILES_DIRS = (STATIC_DEV, )
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(SITE_ROOT, "static")
+STATICFILES_DIRS = (
+    os.path.join(SITE_ROOT, "static_dev"),
+    ("rapp", os.path.join(SITE_ROOT, "dist")),
+)
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
-STATIC_ROOT = os.path.join(SITE_ROOT, "static")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_URL = "/static/"
 
 # Templates
 TEMPLATES = [

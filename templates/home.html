@@ -3,8 +3,24 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-  <div class="container push-top col-sm-8 offset-sm-2 text-center" style="padding-top: 80px;">
-    <h1>Home</h1>
-    <p>How are we doing so far, {{ user.first_name }}?</p>
-  </div>
+  <style>
+    header, footer {
+      margin: 30px;
+    }
+    div#root: {
+      margin: 30px;
+    }
+  </style>
+  {% for stylesheet in stylesheets %}
+    <link rel="stylesheet" href="{{ stylesheet }}"/>
+  {% endfor %}
+  <body>
+    <header>{% if user.first_name %}{{ user.first_name }}'s {% endif %}Home</header>
+    <div id="root">
+      {% for script in scripts %}
+        <script src="{{ script }}"></script>
+      {% endfor %}
+    </div>
+    <footer></footer>
+  </body>
 {% endblock content %}

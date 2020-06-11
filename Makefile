@@ -15,7 +15,7 @@ CELERY=celery
 
 .DEFAULT_GOAL: test
 
-test: djtest # rtest
+test: djtest rtest
 
 requirements.txt: requirements.in
 	$(PIP) install -r requirements.in
@@ -39,8 +39,17 @@ djrun: djbuild
 celery: djbuild
 	$(CELERY) -A djmain worker --loglevel=debug
 
-rrun:
-	$(NPM) run start
+package-lock.json: package.json
+	$(NPM) install
 
-rtest:
-	$(NPM) run test
+rrun: package-lock.json
+	./node_modules/.bin/parcel rapp/index.html
+
+rtest: package-lock.json
+	@echo React tests not yet implemented.
+
+rdist: package-lock.json
+	./node_modules/.bin/parcel build rapp/index.js
+
+clean:
+	rm -rf dist .cache build
