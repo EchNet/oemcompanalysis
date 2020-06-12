@@ -1,24 +1,23 @@
 import * as React from "react"
 
+import { listThings } from "./connectors"
+
 export class Placeholder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      active: false
+      things: []
     }
   }
-  activate() {
-    this.setState({ active: true })
+  componentDidMount() {
+    listThings().then((response) => {
+      this.setState({ things: response.data.data });
+    })
   }
   render() {
     return (
-      <div class="Instrument">
-        {this.state.active && (
-          <div>ACTIVE</div>
-        )}
-        {!this.state.active && (
-          <div onClick={() => this.activate()}>Click here to activate</div>
-        )}
+      <div>
+        {this.state.things.map((ele) => (<li key={ele.text}>{ele.text}</li>))}
       </div>
     )
   }

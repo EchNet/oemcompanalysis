@@ -1,25 +1,5 @@
-.NoteButton {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  border: solid 1px blue;
-  color: blue;
-  text-align: center;
-  margin-top: 20px;
-  line-height: 80px;
-  cursor: pointer;
-  background-color: #fffcfd;
-}
 .Instrument {
   background-color: gray;
   padding: 20px;
-}
-.Keyboard {
-  display: flex;
-  margin: 20px;
-  padding: 20px;
-}
-.GlissandoControl {
-  background-color: white;
-  margin-top: 20px;
+  color: white;
 }

@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
-
-{% block content %}
+{% block load-first %}
+  {{ block.super }}
   <style>
     header, footer {
       margin: 30px;
@@ -14,13 +13,14 @@
   {% for stylesheet in stylesheets %}
     <link rel="stylesheet" href="{{ stylesheet }}"/>
   {% endfor %}
-  <body>
-    <header>{% if user.first_name %}{{ user.first_name }}'s {% endif %}Home</header>
-    <div id="root">
-      {% for script in scripts %}
-        <script src="{{ script }}"></script>
-      {% endfor %}
-    </div>
-    <footer></footer>
-  </body>
+{% endblock %}
+
+{% block content %}
+  <header>A few of {% if user.first_name %}{{ user.first_name }}'s{% else %}my{% endif %} favorite things...</header>
+  <div id="root">
+    {% for script in scripts %}
+      <script src="{{ script }}"></script>
+    {% endfor %}
+  </div>
+  <footer></footer>
 {% endblock content %}
