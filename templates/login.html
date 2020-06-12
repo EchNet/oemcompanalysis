@@ -1,11 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
   <div class="container push-top col-sm-8 offset-sm-2 text-center" style="padding-top: 80px;">
     <h1>Login</h1>
     <p>Here are your choices.</p>
+    <div class="push-top">
+      <form method="POST" class="login-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-group">
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+        <div class="form-group">
+          {{ form.password }}
+          {{ form.password.errors }}
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-wide">Log in with email/password</button>
+        </div>
+      </form>
+    </div>
     <p><a href="{% url "social:begin" "facebook" %}">Login with Facebook</a></p>
+    <p><a href="{% url "social:begin" "google" %}">Login with Google</a></p>
+    <p><a href="{% url "register" %}">Register a new account</a></p>
   </div>
 {% endblock content %}
+
