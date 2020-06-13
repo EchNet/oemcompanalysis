@@ -28,3 +28,6 @@ urlpatterns = [
 
 if settings.SERVE_MEDIA:
   urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+  urlpatterns += path("500/", TemplateView.as_view(template_name="500.html"), name="500"),
