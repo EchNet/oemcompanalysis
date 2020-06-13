@@ -39,3 +39,11 @@ Python code format: There is a yapf style file checked in at .style.yapf in the 
 * Add initial env var settings (script TBD).
 * Add django and node buildpacks.
 * Push.
+
+## Add Facebook login.
+
+* Create a Facebook app.
+* Set App Domain to full domain name.
+* In Heroku env vars, set SOCIAL_AUTH_FACEBOOK_KEY to App ID and SOCIAL_AUTH_FACEBOOK_SECRET to App Secret.
+* Add product Facebook Login to app.
+* Add https://domain.name/complete/facebook/ to Valid OAuth Redirect URIs.
