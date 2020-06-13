@@ -84,6 +84,7 @@ DATABASES["default"]["CONN_MAX_AGE"] = 60
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 LOGIN_ERROR_URL = "/login-error/"
+LOGOUT_REDIRECT_URL = LOGIN_URL
 SECRET_KEY = config("SECRET_KEY")
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [

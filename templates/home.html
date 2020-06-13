@@ -4,9 +4,9 @@
   {{ block.super }}
   <style>
     header, footer {
-      margin: 30px;
+      text-align: right;
     }
-    div#root: {
+    div: {
       margin: 30px;
     }
   </style>
@@ -16,7 +16,8 @@
 {% endblock %}
 
 {% block content %}
-  <header>A few of {% if user.first_name %}{{ user.first_name }}'s{% else %}my{% endif %} favorite things...</header>
+  <header>{% if user.is_authenticated %}<a href="{% url 'logout' %}">Log out</a>{% endif %}</header>
+  <div>A few of {% if user.first_name %}{{ user.first_name }}'s{% else %}my{% endif %} favorite things...</div>
   <div id="root">
     {% for script in scripts %}
       <script src="{{ script }}"></script>

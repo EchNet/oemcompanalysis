@@ -16,6 +16,7 @@ urlpatterns = [
                                       authentication_form=forms.LoginForm,
                                       redirect_authenticated_user=True),
          name="login"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("login-error/",
          TemplateView.as_view(template_name="login-error.html"),
          name="login-error"),
