@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     "rest_framework",
     "rest_framework_swagger",
     'import_export',
+    "social_django",
 
     # custom apps
     "api",
