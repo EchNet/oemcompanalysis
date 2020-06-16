@@ -1,24 +1,36 @@
 import * as React from "react"
 
-import { listThings } from "./connectors"
+import { apiConnector } from "./connectors"
 
 export class Placeholder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      things: []
+      things: [],
+      error: ""
     }
   }
   componentDidMount() {
-    listThings().then((response) => {
-      this.setState({ things: response.data.data });
-    })
+    apiConnector.listThings()
+      .then((response) => {
+        this.setState({ things: response.data.data });
+      })
+      .catch((error) => {
+        this.setState({ error: error.toString() });
+      })
   }
   render() {
-    return (
-      <div>
-        {this.state.things.map((ele) => (<li key={ele.text}>{ele.text}</li>))}
-      </div>
-    )
+    if (this.state.error) {
+      return (
+        <div style={{ color: "red" }}>{this.state.error}</div>
+      )
+    }
+    else {
+      return (
+        <div>
+          {this.state.things.map((ele) => (<li key={ele.text}>{ele.text}</li>))}
+        </div>
+      )
+    }
   }
 }

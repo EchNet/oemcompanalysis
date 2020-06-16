@@ -2,13 +2,30 @@ import logging
 
 from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponseNotAllowed
-from rest_framework import status
+from rest_framework import authentication, status, views
 from rest_framework.response import Response
-from rest_framework import views
+from rest_framework_jwt.settings import api_settings
 
-import api.serializers as serializers
+from api.permissions import IsActiveUser
+from api.serializers import ThingSerializer
 
 logger = logging.getLogger(__name__)
+
+
+class ObtainJwtTokenView(views.APIView):
+  """
+    This view bridges from regular Django authentication to JWT-based authentication.
+  """
+  authentication_classes = (authentication.SessionAuthentication,
+                            authentication.BasicAuthentication)
+  permission_classes = (IsActiveUser, )
+
+  def post(self, request):
+    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+    payload = jwt_payload_handler(request.user)
+    token = jwt_encode_handler(payload)
+    return Response({"token": token}, status.HTTP_200_OK)
 
 
 class BaseApiView(views.APIView):
@@ -23,7 +40,7 @@ class BaseApiView(views.APIView):
       method_descriptor = self.Meta.methods[request.method]
       response_status = method_descriptor.get("ok_response_status", status.HTTP_200_OK)
       many = method_descriptor.get("many", False)
-      serializer = method_descriptor.get("serializer", serializers.ThingSerializer)
+      serializer = method_descriptor.get("serializer", ThingSerializer)
       response_payload = {"data": serializer(data, many=many).data}
       logger.info(response_payload)
     except ValidationError as ve:
@@ -57,7 +74,7 @@ class ListThingsView(BaseApiView):
   class Meta:
     methods = {
         "GET": {
-            "serializer": serializers.ThingSerializer,
+            "serializer": ThingSerializer,
             "many": True,
         }
     }
