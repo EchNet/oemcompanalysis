@@ -1,0 +1,19 @@
+#!/bin/bash
+
+die () {
+  echo >&2 "$@"
+  exit 1
+}
+
+[ "$#" -eq 1 ] || die "usage: $0 APPNAME"
+APPNAME=$1
+
+set -x
+heroku apps:create $APPNAME || die "Exiting."
+heroku buildpacks:set heroku/nodejs || die "Exiting."
+heroku buildpacks:add heroku/python || die "Exiting."
+heroku addons:create heroku-postgresql:hobby-dev || die "Exiting."
+heroku addons:create heroku-redis:hobby-dev || die "Exiting."
+heroku config:set DEFAULT_FILE_STORAGE=django.core.files.storage.FileSystemStorage
+heroku config:set SECRET_KEY="$RANDOM.$RANDOM.$RANDOM.$RANDOM"
+heroku config:set SITE_URL=https://$APPNAME.herokuapp.com
