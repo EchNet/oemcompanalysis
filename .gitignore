@@ -1,7 +1,7 @@
 # Python/Django
 __pycache__/
 *.py[cod]
-env/
+venv/
 static/
 media/
 .env
