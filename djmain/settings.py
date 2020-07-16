@@ -4,7 +4,9 @@
 import os
 import sys
 
+import daphne.server  # Precedes import raven to fix UserWarning.
 import raven
+
 import datetime as datetime
 from celery.schedules import crontab
 from decouple import config
@@ -27,6 +29,7 @@ USE_X_FORWARDED_PORT = True
 
 # Application definition
 INSTALLED_APPS = (
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,7 +42,6 @@ INSTALLED_APPS = (
     "django_extensions",
     "django_object_actions",
     "djcelery_email",
-    "gunicorn",
     "raven.contrib.django.raven_compat",
     "storages",
     "widget_tweaks",
@@ -51,6 +53,7 @@ INSTALLED_APPS = (
 
     # custom apps
     "api",
+    "chat",
     "utils")
 
 MIDDLEWARE = (
@@ -67,12 +70,17 @@ MIDDLEWARE = (
 )
 
 ROOT_URLCONF = "djmain.urls"
-WSGI_APPLICATION = "djmain.wsgi.application"
+ASGI_APPLICATION = "djmain.routing.application"
 
 # Caching
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "MAX_ENTRIES": 1000,
+        }
     }
 }
 
