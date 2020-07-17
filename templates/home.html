@@ -16,8 +16,7 @@
 {% endblock %}
 
 {% block content %}
-  <header>{% if user.is_authenticated %}<a href="{% url 'logout' %}">Log out</a>{% endif %}</header>
-  <div>A few of {% if user.first_name %}{{ user.first_name }}'s{% else %}my{% endif %} favorite things...</div>
+  <header>{% if user.is_authenticated %}{{user.first_name}}<a href="{% url 'logout' %}">Log out</a>{% endif %}</header>
   <div id="root">
     {% for script in scripts %}
       <script src="{{ script }}"></script>

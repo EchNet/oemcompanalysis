@@ -1,5 +1,7 @@
-import axios from "axios";
-import ImportedCookies from "cookies-js";
+import axios from "axios"
+import ImportedCookies from "cookies-js"
+import { w3cwebsocket as WebSocket } from "websocket"
+import EventEmitter from "eventemitter3"
 
 
 const FRESH_MILLIS = 5*60*1000;  // 5 minutes
@@ -50,13 +52,43 @@ class ApiConnector {
   }
 }
 
-const formDataOptions = {
-  withCredentials: true,
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'multipart/form-data; boundary=--3xyNe89--',
-    'X-CSRFToken': ImportedCookies.get('csrftoken'),
-  },
-};
+
+class EchoConnector extends EventEmitter {
+  static getEndpoint() {
+    const scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    return scheme + "://" + window.location.host + "/ws/echo/";
+  }
+  open() {
+    if (this.client && this.client.readyState == WebSocket.OPEN) {
+      return Promise.resolve(this.client)
+    }
+    if (!this.openPromise) {
+      this.openPromise = new Promise((resolve, reject) => {
+        const endpoint = EchoConnector.getEndpoint()
+        this.client = new WebSocket(endpoint)
+        this.client.onopen = () => {
+          this.openPromise = null;
+          this.emit("connect")
+          resolve(this.client)
+        }
+        this.client.onclose = () => {
+          this.emit("disconnect")
+        }
+        this.client.onmessage = (event) => {
+          const data = JSON.parse(event.data)
+          this.emit("message", data.message)
+        }
+      })
+    }
+    return this.openPromise;
+  }
+  send(message) {
+    this.open().then((client) => {
+      client.send(JSON.stringify({ type: "message", message }))
+    })
+  }
+}
+
 
 export const apiConnector = new ApiConnector()
+export const echoConnector = new EchoConnector()

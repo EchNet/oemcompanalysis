@@ -5,6 +5,7 @@ boto3
 celery[redis]
 celery-redbeat
 channels
+channels_redis
 django-celery-email
 django-cors-headers
 django-extensions

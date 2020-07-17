@@ -53,7 +53,7 @@ INSTALLED_APPS = (
 
     # custom apps
     "api",
-    "chat",
+    "echo",
     "utils")
 
 MIDDLEWARE = (
@@ -88,6 +88,16 @@ CACHES = {
 DATABASES = {"default": config("DATABASE_URL", cast=db_url)}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = 60
+
+# Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [config("REDIS_URL")],
+        },
+    },
+}
 
 # Authentication
 LOGIN_REDIRECT_URL = "/"
