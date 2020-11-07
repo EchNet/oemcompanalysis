@@ -6,11 +6,9 @@
 #
 # `make djrun` runs the Django server, listening on port 8000.
 # `make celery` runs a Celery worker.  Needs to be restarted manually when code changes.
-# `make rrun` runs the React webpack server, listening on port 3000.
 
 PIP=pip
 PYTHON=python
-NPM=npm
 CELERY=celery
 
 .DEFAULT_GOAL: test
@@ -38,18 +36,6 @@ djrun: djbuild
 
 celery: djbuild
 	$(CELERY) -A djmain worker --loglevel=debug
-
-package-lock.json: package.json
-	$(NPM) install
-
-rrun: package-lock.json
-	./node_modules/.bin/parcel rapp/index.html
-
-rtest: package-lock.json
-	@echo React tests not yet implemented.
-
-rdist: package-lock.json
-	./node_modules/.bin/parcel build rapp/index.js
 
 clean:
 	rm -rf dist .cache build

@@ -1,11 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
   <div class="container push-top col-sm-8 offset-sm-2 text-center" style="padding-top: 80px;">
+    <div><img src="{% static 'img/fav.jpg' %}"></img></div>
+    <h2>Competitive Analysis</h2>
     <h1>Login</h1>
-    <p>Here are your choices.</p>
     <div class="push-top">
       <form method="POST" class="login-form">
         {% csrf_token %}
@@ -21,11 +23,11 @@
         <div class="form-group">
           <button type="submit" class="btn btn-wide">Log in with email/password</button>
         </div>
+        <div>
+          To request an account, please speak to Liam!
+        </div>
       </form>
     </div>
-    <p><a href="{% url "social:begin" "facebook" %}">Login with Facebook</a></p>
-    <p><a href="{% url "social:begin" "google-oauth2" %}">Login with Google</a></p>
-    <p><a href="{% url "register" %}">Register a new account</a></p>
   </div>
 {% endblock content %}
 
