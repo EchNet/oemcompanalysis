@@ -1,13 +1,8 @@
 """
  Django app settings.
 """
-import os
-import sys
+import datetime, os, raven, sys
 
-import daphne.server  # Precedes import raven to fix UserWarning.
-import raven
-
-import datetime as datetime
 from celery.schedules import crontab
 from decouple import config
 from dj_database_url import parse as db_url
@@ -29,7 +24,6 @@ USE_X_FORWARDED_PORT = True
 
 # Application definition
 INSTALLED_APPS = (
-    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,12 +43,9 @@ INSTALLED_APPS = (
     "rest_framework",
     "rest_framework_swagger",
     'import_export',
-    "social_django",
 
     # custom apps
-    "api",
-    "echo",
-    "utils")
+    "parts")
 
 MIDDLEWARE = (
     'corsheaders.middleware.CorsMiddleware',
@@ -70,7 +61,7 @@ MIDDLEWARE = (
 )
 
 ROOT_URLCONF = "djmain.urls"
-ASGI_APPLICATION = "djmain.routing.application"
+WSGI_APPLICATION = "djmain.wsgi.application"
 
 # Caching
 CACHES = {
@@ -124,12 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
                  ".NumericPasswordValidator")
     },
 ]
-AUTHENTICATION_BACKENDS = (
-    "social_core.backends.facebook.FacebookOAuth2",
-    "social_core.backends.facebook.FacebookAppOAuth2",
-    "social_core.backends.google.GoogleOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
-)
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
@@ -199,8 +184,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "djmain.context_processors.context_settings",
-                "social_django.context_processors.backends",
-                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -272,23 +255,3 @@ JWT_AUTH = {
     "JWT_VERIFY": True,
     "JWT_VERIFY_EXPIRATION": True,
 }
-
-# Social Auth
-SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
-SOCIAL_AUTH_FACEBOOK_KEY = config("SOCIAL_AUTH_FACEBOOK_KEY", default="")
-SOCIAL_AUTH_FACEBOOK_SECRET = config("SOCIAL_AUTH_FACEBOOK_SECRET", default="")
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", default="")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", default="")
-SOCIAL_AUTH_PIPELINE = (
-    "social_core.pipeline.social_auth.social_details",
-    "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.auth_allowed",
-    "social_core.pipeline.social_auth.social_user",
-    "social_core.pipeline.user.get_username",
-    "social_core.pipeline.user.create_user",
-    "djmain.social_auth.trace",
-    "social_core.pipeline.social_auth.associate_user",
-    "social_core.pipeline.social_auth.load_extra_data",
-    "social_core.pipeline.user.user_details",
-)
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True

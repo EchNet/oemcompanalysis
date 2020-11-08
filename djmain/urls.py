@@ -20,8 +20,6 @@ urlpatterns = [
     path("login-error/",
          TemplateView.as_view(template_name="login-error.html"),
          name="login-error"),
-    path("register/", TemplateView.as_view(template_name="register.html"), name="register"),
-    path("", include("social_django.urls")),
     path("admin/", admin.site.urls),
     path("api/1.0/", include("api.urls")),
 ]

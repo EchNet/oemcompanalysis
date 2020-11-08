@@ -1,11 +1,8 @@
 # Required python modules.
 
 Django
-boto3
 celery[redis]
 celery-redbeat
-channels
-channels_redis
 django-celery-email
 django-cors-headers
 django-extensions
@@ -19,12 +16,12 @@ django-widget-tweaks
 djangorestframework
 djangorestframework-jwt
 dj-database-url
+gunicorn
 psycopg2-binary
 python-decouple
 python-dotenv
 python-jose
 raven
-social-auth-app-django
 wheel
 whitenoise
 yapf

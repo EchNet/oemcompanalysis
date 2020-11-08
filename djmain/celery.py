@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 import celery
 import os
-import daphne.server  # Precedes import raven to fix UserWarning related to Twisted reactor.
 import raven
 
 from raven.contrib.celery import register_logger_signal, register_signal
