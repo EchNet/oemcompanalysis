@@ -1,26 +1,16 @@
 {% extends "base.html" %}
 
-{% block load-first %}
-  {{ block.super }}
-  <style>
-    header, footer {
-      text-align: right;
-    }
-    div: {
-      margin: 30px;
-    }
-  </style>
-  {% for stylesheet in stylesheets %}
-    <link rel="stylesheet" href="{{ stylesheet }}"/>
-  {% endfor %}
-{% endblock %}
-
 {% block content %}
-  <header>{% if user.is_authenticated %}{{user.first_name}}<a href="{% url 'logout' %}">Log out</a>{% endif %}</header>
-  <div id="root">
-    {% for script in scripts %}
-      <script src="{{ script }}"></script>
-    {% endfor %}
+  <header>
+    <div>OEM Interactive - Competitive Analysis</div>
+    <div class="small upper">
+      WELCOME, {{user.first_name|default:user.username}} |
+      {% if user.is_superuser %}<a href="/admin">Data Admin</a> | {% endif %}
+      <a href="{% url 'logout' %}">Log out</a>
+    </div>
+  </header>
+  <div style="padding: 40px">
+    REPORTS COMING SOON.
   </div>
   <footer></footer>
 {% endblock content %}
