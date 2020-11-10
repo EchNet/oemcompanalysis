@@ -10,10 +10,13 @@
       <a href="{% url 'logout' %}">Log out</a>
     </div>
   </header>
-  <div style="padding: 40px">
-    <div class="entity-list" data-query="manufacturer"></div>
-    <div class="entity-list" data-query="website"></div>
-    <div class="entity-list" data-query="part"></div>
+  <div style="margin: 40px; width: 480px; display: flex; justify-content: space-evenly; align-items: center;">
+    <div class="manufacturer-select-container"></div>
+    <div class="parttype-select-container"></div>
+    <button class="run-button" type="button" disabled="disabled">RUN</button>
+  </div>
+  <div style="display: flex; padding: 40px">
+    <div class="website-list-container"></div>
   </div>
   <footer></footer>
 {% endblock content %}
@@ -21,6 +24,30 @@
 {% block load-last %}
 <script type="text/javascript">
 (function() {
+  // Selectors
+  var MANUFACTURER_SELECT = ".manufacturer-select-container select";
+  var PARTTYPE_SELECT = ".parttype-select-container select";
+  var RUN_BUTTON = "button.run-button";
+  var WEBSITE_LIST_CONTAINER = "div.website-list-container";
+
+  // State
+  var currentManufacturer;
+  var currentPartType;
+
+  function getJwtToken() {
+    return $("config[name='jwt']").attr("value")
+  }
+
+  function getData(path) {
+    return $.ajax({
+      url: "/api/1.0/" + path,
+      type: "GET",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("Accept", "application/json")
+        xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+      }
+    })
+  }
 
   function whenPageLoaded(callback) {
     if (document.readyState != "loading") {
@@ -38,45 +65,68 @@
     }
   }
 
-  function forEachElementOfClass(className, func) {
-    var elements = document.getElementsByClassName(className);
-    for (var i = 0; i < elements.length; ++i) {
-      func(elements[i]);
+  function onFilterChange() {
+    var manufacturer = $(MANUFACTURER_SELECT).val();
+    var partType = $(PARTTYPE_SELECT).val();
+    if (manufacturer != currentManufacturer || partType != currentPartType) {
+      resetReport()
+    }
+    if (!!manufacturer && !!partType) {
+      $(RUN_BUTTON).removeAttr("disabled");
+    }
+    else {
+      $(RUN_BUTTON).attr("disabled", "disabled");
     }
   }
 
-  var ENTITY_LIST_TEMPLATES = {
-    "manufacturer": "{% templatetag openvariable %} name {% templatetag closevariable %}",
-    "website": "{% templatetag openvariable %} domain_name {% templatetag closevariable %}",
-    "part": "{% templatetag openvariable %} part_number {% templatetag closevariable %}"
+  function resetReport() {
+    $(WEBSITE_LIST_CONTAINER).empty()
   }
 
-  function renderEntityList(div, q, data) {
-    div.append($("<div class='subhead'>").text(q.toUpperCase() + "S"))
+  function renderManufacturerSelect(div, data) {
+    const TEMPLATE = "<option value ='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} name {% templatetag closevariable %}</option>";
+    select = $("<select>")
+    select.append($("<option value=''>Select a manufacturer</option>"))
+    div.append(select)
     for (var i = 0; i < data.length; ++i) {
-      div.append($("<div>").text(Mustache.render(ENTITY_LIST_TEMPLATES[q], data[i])))
+      select.append($(Mustache.render(TEMPLATE, data[i])))
+    }
+    select.on("change", onFilterChange)
+  }
+
+  function renderPartTypeSelect(div, data) {
+    select = $("<select>")
+    select.append($("<option value=''>Select a type</option>"))
+    div.append(select)
+    {% for t in PartType.CHOICES %}
+      select.append($("<option value='{{ t.0 }}'>").text("{{ t.1 }}"))
+    {% endfor %}
+    select.on("change", onFilterChange)
+  }
+
+  function renderWebsiteList(div, data) {
+    const TEMPLATE = "<li data-value='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} domain_name {% templatetag closevariable %}</li>";
+    for (var i = 0; i < data.length; ++i) {
+      div.append($(Mustache.render(TEMPLATE, data[i])))
     }
   }
 
-  function getJwtToken() {
-    return $("config[name='jwt']").attr("value")
+  function wireRunButton() {
+    $("button.run-button").on("click", function() {
+      currentManufacturer = $(MANUFACTURER_SELECT).val()
+      currentPartType = $(PARTTYPE_SELECT).val()
+      getData("manufacturer/" + currentManufacturer + "/website").done(function(data) {
+        renderWebsiteList($(WEBSITE_LIST_CONTAINER), data)
+      })
+    })
   }
 
   function startUp(params) {
-    $(".entity-list").each(function(ix, div) {
-      var q = $(div).attr("data-query")
-      $.ajax({
-        url: "/api/1.0/" + q,
-        type: "GET",
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Accept", "application/json")
-          xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
-        },
-        success: function(response) {
-          renderEntityList($(div), q, response)
-        }
-      })
+    getData("manufacturer").done(function(data) {
+      renderManufacturerSelect($(".manufacturer-select-container"), data)
     })
+    renderPartTypeSelect($(".parttype-select-container"))
+    wireRunButton()
   }
 
   whenPageLoaded(startUp)

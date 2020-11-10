@@ -184,6 +184,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "djmain.context_processors.context_settings",
+                "parts.context_processors.context_settings",
             ],
         },
     },
