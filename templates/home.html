@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <config name="jwt" value="{{token}}"></config>
   <header>
     <div>OEM Interactive - Competitive Analysis</div>
     <div class="small upper">
@@ -10,7 +11,75 @@
     </div>
   </header>
   <div style="padding: 40px">
-    REPORTS COMING SOON.
+    <div class="entity-list" data-query="manufacturer"></div>
+    <div class="entity-list" data-query="website"></div>
+    <div class="entity-list" data-query="part"></div>
   </div>
   <footer></footer>
 {% endblock content %}
+
+{% block load-last %}
+<script type="text/javascript">
+(function() {
+
+  function whenPageLoaded(callback) {
+    if (document.readyState != "loading") {
+      callback();
+    }
+    else if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", callback);
+    }
+    else {
+      document.attachEvent("onreadystatechange", function() {
+        if (document.readyState == "complete") {
+          callback();
+        }
+      })
+    }
+  }
+
+  function forEachElementOfClass(className, func) {
+    var elements = document.getElementsByClassName(className);
+    for (var i = 0; i < elements.length; ++i) {
+      func(elements[i]);
+    }
+  }
+
+  var ENTITY_LIST_TEMPLATES = {
+    "manufacturer": "{% templatetag openvariable %} name {% templatetag closevariable %}",
+    "website": "{% templatetag openvariable %} domain_name {% templatetag closevariable %}",
+    "part": "{% templatetag openvariable %} part_number {% templatetag closevariable %}"
+  }
+
+  function renderEntityList(div, q, data) {
+    div.append($("<div class='subhead'>").text(q.toUpperCase() + "S"))
+    for (var i = 0; i < data.length; ++i) {
+      div.append($("<div>").text(Mustache.render(ENTITY_LIST_TEMPLATES[q], data[i])))
+    }
+  }
+
+  function getJwtToken() {
+    return $("config[name='jwt']").attr("value")
+  }
+
+  function startUp(params) {
+    $(".entity-list").each(function(ix, div) {
+      var q = $(div).attr("data-query")
+      $.ajax({
+        url: "/api/1.0/" + q,
+        type: "GET",
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Accept", "application/json")
+          xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+        },
+        success: function(response) {
+          renderEntityList($(div), q, response)
+        }
+      })
+    })
+  }
+
+  whenPageLoaded(startUp)
+})();
+</script>
+{% endblock load-last %}
