@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     "django.contrib.humanize",
 
     # 3rd party
+    "admin_auto_filters",
     "django_extensions",
     "django_object_actions",
     "djcelery_email",

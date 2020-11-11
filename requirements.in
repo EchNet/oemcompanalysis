@@ -3,6 +3,7 @@
 Django
 celery[redis]
 celery-redbeat
+django-admin-autocomplete-filter
 django-celery-email
 django-cors-headers
 django-extensions

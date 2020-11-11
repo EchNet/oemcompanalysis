@@ -20,6 +20,9 @@ class Manufacturer(models.Model):
                           unique=True,
                           verbose_name=_("name"))
 
+  def __str__(self):
+    return self.name
+
 
 class Website(models.Model):
   """
@@ -50,6 +53,9 @@ class Website(models.Model):
                                 null=False,
                                 default=datetime.date.today,
                                 verbose_name=("start date"))
+
+  def __str__(self):
+    return self.domain_name
 
 
 class PartType(object):
@@ -103,7 +109,7 @@ class Part(models.Model):
                                       max_length=SHORT_MAX_LENGTH,
                                       default=CostPriceRange.DEFAULT,
                                       choices=CostPriceRange.CHOICES,
-                                      verbose_name=_("type"))
+                                      verbose_name=_("cost price range"))
 
   # The manufacturer of the part.
   manufacturer = models.ForeignKey(
@@ -115,6 +121,13 @@ class Part(models.Model):
       to=Manufacturer,
       verbose_name=_("manufacturer"),
   )
+
+  def __str__(self):
+    return self.part_number
+
+  @property
+  def manufacturer_name(self):
+    return self.manufacturer.name
 
 
 class PartPrice(models.Model):

@@ -1,3 +1,4 @@
+from admin_auto_filters.filters import AutocompleteFilterFactory
 from django.contrib import admin
 
 from .models import (
@@ -14,6 +15,7 @@ class ManufacturerAdmin(admin.ModelAdmin):
       "id",
       "name",
   )
+  search_fields = ("name", )
 
 
 class WebsiteAdmin(admin.ModelAdmin):
@@ -21,20 +23,32 @@ class WebsiteAdmin(admin.ModelAdmin):
       "id",
       "domain_name",
   )
+  search_fields = ("domain_name", )
 
 
 class PartAdmin(admin.ModelAdmin):
-  list_display = (
-      "id",
-      "part_number",
+  list_display = ("id", "part_number", "manufacturer")
+  search_fields = ("part_number", "title")
+  list_filter = (
+      AutocompleteFilterFactory("Manufacturer", "manufacturer"),
+      "part_type",
+      "cost_price_range",
   )
+
+  class Media:  # See django-admin-autocomplete-filter docs
+    pass
 
 
 class PartPriceAdmin(admin.ModelAdmin):
   list_display = (
       "id",
       "date",
-      "part_number",
+      "part",
+  )
+  list_filter = (
+      AutocompleteFilterFactory("Part", "part"),
+      AutocompleteFilterFactory("Website", "website"),
+      "date",
   )
 
 
@@ -42,8 +56,9 @@ class PartCostPointAdmin(admin.ModelAdmin):
   list_display = (
       "id",
       "start_date",
-      "part_number",
+      "part",
   )
+  list_filter = (AutocompleteFilterFactory("Part", "part"), "start_date")
 
 
 admin.site.register(Manufacturer, ManufacturerAdmin)
