@@ -88,6 +88,15 @@ class Part(models.Model):
                                choices=PartType.CHOICES,
                                verbose_name=_("type"))
 
+  # Descriptive text
+  title = models.CharField(
+      blank=True,
+      db_index=False,
+      null=True,
+      max_length=MEDIUM_MAX_LENGTH,
+      verbose_name=_("title"),
+  )
+
   # "0-50", "50-100", etc.
   cost_price_range = models.CharField(blank=False,
                                       null=False,
