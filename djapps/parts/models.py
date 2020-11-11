@@ -17,6 +17,7 @@ class Manufacturer(models.Model):
   name = models.CharField(blank=False,
                           null=False,
                           max_length=MEDIUM_MAX_LENGTH,
+                          unique=True,
                           verbose_name=_("name"))
 
 
@@ -30,6 +31,7 @@ class Website(models.Model):
                                  db_index=True,
                                  null=False,
                                  max_length=MEDIUM_MAX_LENGTH,
+                                 unique=True,
                                  verbose_name=_("domain name"))
 
   # A site can sell parts from multiple manufacturers.
