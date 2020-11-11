@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
   <config name="jwt" value="{{token}}"></config>
   <header>
-    <div>OEM Interactive - Competitive Analysis</div>
+    <div><img src="{% static 'img/logo.png' %}" height="26"/> - Competitive Analysis</div>
     <div class="small upper">
-      WELCOME, {{user.first_name|default:user.username}} |
+      <span class="welcome">Welcome, {{user.first_name|default:user.username}}</span> |
       {% if user.is_superuser %}<a href="/admin">Data Admin</a> | {% endif %}
       <a href="{% url 'logout' %}">Log out</a>
     </div>
