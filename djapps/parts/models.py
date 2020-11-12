@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -83,6 +84,7 @@ class Part(models.Model):
       db_index=True,
       null=False,
       max_length=MEDIUM_MAX_LENGTH,
+      unique=True,
       verbose_name=_("part number"),
   )
 
@@ -215,3 +217,30 @@ class PartCostPoint(models.Model):
   @property
   def part_number(self):
     return self.part.part_number
+
+
+class UploadProgress(models.Model):
+
+  # The associated user.
+  user = models.ForeignKey(
+      blank=False,
+      db_index=True,
+      null=False,
+      on_delete=models.CASCADE,
+      related_name="uploads",
+      to=get_user_model(),
+      verbose_name=_("user"),
+  )
+
+  # Status: "running", "done", "error".
+  status = models.CharField(
+      blank=False,
+      max_length=12,
+      null=False,
+      default="running",
+      verbose_name=_("status"),
+  )
+
+  rows_processed = models.PositiveIntegerField(default=0)
+  objects_added = models.PositiveIntegerField(default=0)
+  errors = models.JSONField(blank=True, null=True)
