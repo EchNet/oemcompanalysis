@@ -1,16 +1,8 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block content %}
   <config name="jwt" value="{{token}}"></config>
-  <header>
-    <div><img src="{% static 'img/logo.png' %}" height="26"/> - Competitive Analysis</div>
-    <div class="small upper">
-      <span class="welcome">Welcome, {{user.first_name|default:user.username}}</span> |
-      {% if user.is_superuser %}<a href="/admin">Data Admin</a> | {% endif %}
-      <a href="{% url 'logout' %}">Log out</a>
-    </div>
-  </header>
+  {% include "header.html" %}
   <div style="margin: 40px; width: 480px; display: flex; justify-content: space-evenly; align-items: center;">
     <div class="manufacturer-select-container"></div>
     <div class="parttype-select-container"></div>
@@ -122,7 +114,7 @@
     })
   }
 
-  function startUp(params) {
+  function startUp() {
     getData("manufacturer").done(function(data) {
       renderManufacturerSelect($(".manufacturer-select-container"), data)
     })

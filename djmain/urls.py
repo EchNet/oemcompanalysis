@@ -20,6 +20,7 @@ urlpatterns = [
     path("login-error/",
          TemplateView.as_view(template_name="login-error.html"),
          name="login-error"),
+    path("upload/", TemplateView.as_view(template_name="upload.html"), name="upload"),
     path("admin/", admin.site.urls),
     path("api/1.0/", include("api.urls")),
 ]

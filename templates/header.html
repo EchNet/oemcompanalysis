@@ -1,0 +1,11 @@
+{% load static %}
+
+<header>
+  <div><a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" height="23"/></a> Competitive Analysis</div>
+  <div class="small upper">
+    <span class="welcome">Welcome, {{user.first_name|default:user.username}}</span> |
+    {% if user.is_superuser %}<a href="/admin">Admin</a> | {% endif %}
+    {% if user.is_superuser %}<a href="{% url "upload" %}">Data Upload</a> | {% endif %}
+    <a href="{% url 'logout' %}">Log out</a>
+  </div>
+</header>
