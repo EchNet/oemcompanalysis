@@ -1,7 +1,7 @@
 import logging
 
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, views
 from rest_framework.response import Response
 
 from api import serializers as serializers
@@ -40,6 +40,24 @@ class PartView(generics.ListAPIView):
   def get_queryset(self):
     return Part.objects.all().order_by("part_number")
 
+  def post(self, request):
+    file = request.FILES.get("file", None)
+    string_data = file.read().decode("utf-8")
+    up = UploadProgress.objects.create(user=request.user)
+    run_parts_upload.delay(up.id, string_data)
+    return Response({"progress_id": pup.id})
+
+
+class PriceView(views.APIView):
+  def post(self, request):
+    file = request.FILES.get("file", None)
+    string_data = file.read().decode("utf-8")
+    up = UploadProgress.objects.create(user=request.user)
+    run_parts_upload.delay(up.id, string_data)
+    return Response({"progress_id": pup.id})
+
+
+class CostView(views.APIView):
   def post(self, request):
     file = request.FILES.get("file", None)
     string_data = file.read().decode("utf-8")

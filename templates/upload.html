@@ -3,8 +3,45 @@
 {% block content %}
   <config name="jwt" value="{{token}}"></config>
   {% include "header.html" %}
-  <div style="margin: 40px; width: 480px; display: flex; justify-content: space-evenly; align-items: center;">
-    Coming soon.
+  <div style="text-align: center; margin: 40px auto 0; width: 480px;">
+    <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
+      <form method="POST" action="{% url 'parts' %}">
+        <h3>Parts</h3>
+        <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
+          <div>PartNumber</div>
+          <div>PartType</div>
+          <div>CostPriceRange</div>
+          <div>Manufacturer</div>
+        </div>
+        <div style="margin: 4px;"><input type="file" name="file"></input></div>
+        <div><button type="submit">Upload Parts CSV</button></div>
+      </form>
+    </div>
+    <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
+      <form method="POST" action="{% url 'prices' %}">
+        <h3>Price Data</h3>
+        <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
+          <div>Date</div>
+          <div>Website</div>
+          <div>PartNumber</div>
+          <div>PartPrice</div>
+        </div>
+        <div style="margin: 4px;"><input type="file" name="file"></input></div>
+        <div><button type="submit">Upload Prices CSV</button></div>
+      </form>
+    </div>
+    <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
+      <form method="POST" action="{% url 'costs' %}">
+        <h3>Cost Data</h3>
+        <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
+          <div>Date</div>
+          <div>PartNumber</div>
+          <div>Cost</div>
+        </div>
+        <div style="margin: 4px;"><input type="file" name="file"></input>
+        <div><button type="submit">Upload Costs CSV</button></div>
+      </form>
+    </div>
   </div>
   <footer></footer>
 {% endblock content %}

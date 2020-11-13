@@ -78,8 +78,8 @@ class PartsLoader(GenericLoader):
   def _map_data(self, data):
     mapped_data = {}
     mapped_data["part_number"] = data["partnumber"]
-    mapped_data["part_type"] = data["part_type"]
-    mapped_data["cost_price_range"] = data["cost_price_range"]
+    mapped_data["part_type"] = data["parttype"]
+    mapped_data["cost_price_range"] = data["costpricerange"]
     mapped_data["manufacturer_id"] = Manufacturer.objects.get(name=data["manufacturer"])
     return mapped_data
 
