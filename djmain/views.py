@@ -7,10 +7,7 @@ from rest_framework_jwt.settings import api_settings as jwt_api_settings
 logger = logging.getLogger(__name__)
 
 
-class HomeView(TemplateView):
-  """
-    The home page, which houses the app.
-  """
+class PageView(TemplateView):
   def get(self, request, *args, **kwargs):
     if not request.user.is_authenticated:
       return redirect("login")
@@ -29,3 +26,7 @@ class HomeView(TemplateView):
     jwt_encode_handler = jwt_api_settings.JWT_ENCODE_HANDLER
     payload = jwt_payload_handler(self.request.user)
     return jwt_encode_handler(payload)
+
+
+class HomeView(PageView):
+  template_name = "home.html"

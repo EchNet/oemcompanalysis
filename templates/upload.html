@@ -5,7 +5,7 @@
   {% include "header.html" %}
   <div style="text-align: center; margin: 40px auto 0; width: 480px;">
     <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
-      <form method="POST" action="{% url 'parts' %}">
+      <form name="parts" method="POST">
         <h3>Parts</h3>
         <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
           <div>PartNumber</div>
@@ -13,12 +13,12 @@
           <div>CostPriceRange</div>
           <div>Manufacturer</div>
         </div>
-        <div style="margin: 4px;"><input type="file" name="file"></input></div>
+        <div style="margin: 4px;"><input type="file" name="file" accept="text/csv"></input></div>
         <div><button type="submit">Upload Parts CSV</button></div>
       </form>
     </div>
     <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
-      <form method="POST" action="{% url 'prices' %}">
+      <form name="prices" method="POST">
         <h3>Price Data</h3>
         <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
           <div>Date</div>
@@ -26,19 +26,19 @@
           <div>PartNumber</div>
           <div>PartPrice</div>
         </div>
-        <div style="margin: 4px;"><input type="file" name="file"></input></div>
+        <div style="margin: 4px;"><input type="file" name="file" accept="text/csv"></input></div>
         <div><button type="submit">Upload Prices CSV</button></div>
       </form>
     </div>
     <div style="margin: 10px; padding: 20px; border: solid 1px #ddd;">
-      <form method="POST" action="{% url 'costs' %}">
+      <form name="costs" method="POST">
         <h3>Cost Data</h3>
         <div style="border: solid 1px #ddd; padding: 4px; display: flex; justify-content: space-between; width: 100%;">
           <div>Date</div>
           <div>PartNumber</div>
           <div>Cost</div>
         </div>
-        <div style="margin: 4px;"><input type="file" name="file"></input>
+        <div style="margin: 4px;"><input type="file" name="file" accept="text/csv"></input></div>
         <div><button type="submit">Upload Costs CSV</button></div>
       </form>
     </div>
@@ -52,17 +52,6 @@
 
   function getJwtToken() {
     return $("config[name='jwt']").attr("value")
-  }
-
-  function getData(path) {
-    return $.ajax({
-      url: "/api/1.0/" + path,
-      type: "GET",
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-        xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
-      }
-    })
   }
 
   function whenPageLoaded(callback) {
@@ -81,10 +70,24 @@
     }
   }
 
-  function startUp() {
-  }
-
-  whenPageLoaded(startUp)
+  whenPageLoaded(function () {
+    $("form").on("submit", function(event) {
+      event.preventDefault()
+      var $form = $(this)
+      var file = $form.find("input")[0].files[0]
+      if (!file) {
+        alert("Select a CSV file to upload.")
+        return;
+      }
+      var formData = new FormData();
+      formData.append("file", file);
+      xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/1.0/" + $form.attr("name"))
+      xhr.setRequestHeader("Accept", "application/json")
+      xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+      xhr.send(formData);
+    })
+  })
 })();
 </script>
 {% endblock load-last %}

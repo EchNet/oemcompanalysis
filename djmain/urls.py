@@ -10,7 +10,7 @@ import djmain.forms as forms
 import djmain.views as views
 
 urlpatterns = [
-    path("", views.HomeView.as_view(template_name="home.html"), name="home"),
+    path("", views.HomeView.as_view(), name="home"),
     path("login/",
          auth_views.LoginView.as_view(template_name="login.html",
                                       authentication_form=forms.LoginForm,
@@ -20,7 +20,7 @@ urlpatterns = [
     path("login-error/",
          TemplateView.as_view(template_name="login-error.html"),
          name="login-error"),
-    path("upload/", TemplateView.as_view(template_name="upload.html"), name="upload"),
+    path("upload/", views.PageView.as_view(template_name="upload.html"), name="upload"),
     path("admin/", admin.site.urls),
     path("api/1.0/", include("api.urls")),
 ]
