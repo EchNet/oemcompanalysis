@@ -8,7 +8,7 @@ from decouple import config
 from dj_database_url import parse as db_url
 
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-APPS_ROOT = os.path.join(SITE_ROOT, "djapps")
+APPS_ROOT = SITE_ROOT
 sys.path.insert(0, APPS_ROOT)
 
 # Environment
