@@ -3,7 +3,7 @@ import json, logging, re, requests, urllib
 from dateutil.parser import parse
 from django.core.exceptions import ValidationError
 
-from .models import Part, PartPrice, PartCostPoint
+from .models import Manufacturer, Part, PartPrice, PartCostPoint, Website
 
 logger = logging.getLogger(__name__)
 
@@ -25,39 +25,50 @@ class GenericLoader:
     row_index = -1
     rows_processed = 0
 
+    keep_going = True
     for row in self.reader:
       row_index += 1
       if not "".join(row):  # Ignore empty rows
-        pass
-      elif not self.mappings:
-        # Scan for headers to determine schema.
-        self._map_headers(row)  # May raise ValidationError
-      else:
-        try:
+        continue
+      try:
+        if not self.mappings:
+          self._map_headers(row)
+        else:
           rows_processed += 1
-          self.objects_added.append(self._process_row(row))
-        except ValidationError as e:
-          self.errors.append({'key': row_index, 'row': row, 'error': e})
-        if updater:
-          updater(rows_processed=rows_processed,
-                  objects_added=len(self.objects_added),
-                  errors=self.errors)
+          obj, created = self._process_row(row)
+          if created:
+            self.objects_added.append(obj)
+      except ValidationError as e:
+        for msg in iter(e):
+          self.errors.append(f"row {row_index + 1}: {str(msg)}")
+        keep_going = self.mappings is not None
+      except Exception as e:
+        self.errors.append(f"row {row_index + 1}: {str(e)}")
+        keep_going = self.mappings is not None
+      if updater:
+        updater(status="running" if keep_going else "error",
+                rows_processed=rows_processed,
+                objects_added=len(self.objects_added),
+                errors=self.errors)
+      if not keep_going:
+        return
+    updater(status="done")
 
   def _process_row(self, row):
     data = {}
-    for f in self.FIELDS:
+    for f in self.KEY_FIELDS + self.FIELDS:
       data[f] = row[self.mappings[f]] if self.mappings[f] < len(row) else ""
-    return self._process_data(data)
-    return (self.MODEL_CLASS).objects.create(**self._map_data(data))
+    keys, fields = self._map_data(data)
+    return (self.MODEL_CLASS).objects.update_or_create(**keys, defaults=fields)
 
   def _map_headers(self, row):
     mappings = {}
     for idx, val in enumerate(row):
       h = self.normalize_header(val)
-      if h in self.FIELDS:
+      if h in self.KEY_FIELDS + self.FIELDS:
         mappings[h] = idx
       else:
-        raise ValidationError(f"Unrecognized header {val}")
+        raise ValidationError(f"unrecognized header '{val}'")
 
     # Check that all fields are present.
     missing_fields = []
@@ -72,40 +83,46 @@ class GenericLoader:
 
 class PartsLoader(GenericLoader):
 
-  FIELDS = set(["partnumber", "parttype", "costpricerange", "manufacturer"])
+  KEY_FIELDS = ["partnumber"]
+  FIELDS = ["parttype", "costpricerange", "title", "manufacturer"]
   MODEL_CLASS = Part
 
   def _map_data(self, data):
-    mapped_data = {}
-    mapped_data["part_number"] = data["partnumber"]
-    mapped_data["part_type"] = data["parttype"]
-    mapped_data["cost_price_range"] = data["costpricerange"]
-    mapped_data["manufacturer_id"] = Manufacturer.objects.get(name=data["manufacturer"])
-    return mapped_data
+    keys = {}
+    fields = {}
+    keys["part_number"] = data["partnumber"]
+    fields["part_type"] = data["parttype"]
+    fields["cost_price_range"] = data["costpricerange"]
+    fields["manufacturer"] = Manufacturer.objects.get(name=data["manufacturer"])
+    return keys, fields
 
 
 class PricesLoader(GenericLoader):
 
-  FIELDS = set(["date", "website", "partnumber", "partprice"])
+  KEY_FIELDS = ["date", "website", "partnumber"]
+  FIELDS = ["partprice"]
   MODEL_CLASS = PartPrice
 
   def _map_data(self, data):
-    mapped_data = {}
-    mapped_data["date"] = data["date"]
-    mapped_data["website"] = Website.objects.get(domain_name=data["website"])
-    mapped_data["part"] = Part.objects.get(part_number=data["partnumber"])
-    mapped_data["part_price"] = data["partprice"]
-    return mapped_data
+    keys = {}
+    fields = {}
+    keys["date"] = data["date"]
+    keys["website"] = Website.objects.get(domain_name=data["website"])
+    keys["part"] = Part.objects.get(part_number=data["partnumber"])
+    fields["price"] = data["partprice"]
+    return keys, fields
 
 
 class CostsLoader(GenericLoader):
 
-  FIELDS = set(["date", "partnumber", "cost"])
+  KEY_FIELDS = ["date", "partnumber"]
+  FIELDS = ["cost"]
   MODEL_CLASS = PartCostPoint
 
   def _map_data(self, data):
-    mapped_data = {}
-    mapped_data["start_date"] = data["date"]
-    mapped_data["part"] = Part.objects.get(part_number=data["partnumber"])
-    mapped_data["cost"] = data["cost"]
-    return mapped_data
+    keys = {}
+    fields = {}
+    keys["start_date"] = data["date"]
+    keys["part"] = Part.objects.get(part_number=data["partnumber"])
+    fields["cost"] = data["cost"]
+    return keys, fields

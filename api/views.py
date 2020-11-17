@@ -66,3 +66,15 @@ class CostsView(views.APIView):
     up = UploadProgress.objects.create(user=request.user)
     run_costs_upload.delay(up.id, string_data)
     return Response({"progress_id": up.id})
+
+
+class ProgressView(generics.ListAPIView):
+  def get(self, request, *args, **kwargs):
+    progress_id = self.kwargs.get("progress_id")
+    progress = get_object_or_404(request.user.uploads.all(), id=progress_id)
+    return Response({
+        "status": progress.status,
+        "rows_processed": progress.rows_processed,
+        "objects_added": progress.objects_added,
+        "errors": progress.errors,
+    })

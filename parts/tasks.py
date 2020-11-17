@@ -13,14 +13,7 @@ def do_upload(LoaderClass, what, upload_progress_id, string_data):
   def update_progress(*args, **kwargs):
     UploadProgress.objects.filter(id=upload_progress_id).update(**kwargs)
 
-  try:
-    LoaderClass(csv.reader(StringIO(string_data))).process(update_progress)
-  except Exception as e:
-    logger.exception(f"Unexpected error in {what} upload")
-    update_progress(status="error")
-    return
-
-  update_progress(status="done")
+  LoaderClass(csv.reader(StringIO(string_data))).process(update_progress)
 
 
 @shared_task

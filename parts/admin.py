@@ -58,3 +58,11 @@ class PartCostPointAdmin(admin.ModelAdmin):
       "part",
   )
   list_filter = (AutocompleteFilterFactory("Part", "part"), "start_date")
+
+
+@admin.register(models.UploadProgress)
+class ProgressAdmin(admin.ModelAdmin):
+  list_display = (
+      "id",
+      "user",
+  )

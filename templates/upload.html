@@ -80,6 +80,7 @@
         <div class="innerbox">
           <div>PartNumber</div>
           <div>PartType</div>
+          <div>Title</div>
           <div>CostPriceRange</div>
           <div>Manufacturer</div>
         </div>
@@ -126,7 +127,8 @@
       <div>Upload status: <span class="subst val" name="status"></span></div>
       <div>Rows processed: <span class="subst val" name="rows_processed"></span></div>
       <div><span class="subst title" name="itemLabel"></span> added: <span class="subst val" name="objects_added"></span></div>
-      <div>Errors: <span class="subst error" name="error"></span></div>
+      <div>Errors:</div>
+      <div style="padding-left: 30px;" class="subst error" name="errors"></div>
     </div>
   </div>
 {% endblock content %}
@@ -176,15 +178,41 @@
   }
 
   function updateProgressBoxText(props, clear) {
+    console.log(props);
+
     $(".progressbox .subst").each(function() {
       var name = $(this).attr("name");
-      if ((name in props) || clear) {
-        $(this).text(props[name] || "")
+      if (name in props) {
+        if (Array.isArray(props[name])) {
+          $(this).html(props[name].join("<br>"))
+        }
+        else {
+          $(this).text(props[name])
+        }
+      }
+      else if (clear) {
+        $(this).text("")
       }
     })
   }
 
   function startProgressMonitor(progressId) {
+    $.ajax({
+      url: "/api/1.0/progress/" + progressId,
+      type: "GET",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("Accept", "application/json")
+        xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+      },
+      success: function(data) {
+        updateProgressBoxText(data);
+        if (data.status !== "done" && data.status !== "error") {
+          setTimeout(function() {
+            startProgressMonitor(progressId)
+          }, 1000)
+        }
+      }
+    })
   }
 
   whenPageLoaded(function() {

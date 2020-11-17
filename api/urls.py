@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^parts/?$', api_views.PartsView.as_view()),
     url(r'^prices/?$', api_views.PricesView.as_view()),
     url(r'^costs/?$', api_views.CostsView.as_view()),
+    url(r'^progress/(?P<progress_id>[0-9]+)/?$', api_views.ProgressView.as_view()),
 ]
