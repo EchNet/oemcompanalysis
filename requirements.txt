@@ -62,6 +62,7 @@ six==1.15.0
 sqlparse==0.4.1
 tablib==2.0.0
 tenacity==6.2.0
+unicodecsv==0.14.1
 uritemplate==3.0.1
 urllib3==1.25.11
 vine==5.0.0

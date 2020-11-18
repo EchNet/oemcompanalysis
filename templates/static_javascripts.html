@@ -3,3 +3,36 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+
+<script type="text/javascript">
+  function getJwtToken() {
+    return $("config[name='jwt']").attr("value")
+  }
+
+  function getData(path) {
+    return $.ajax({
+      url: "/api/1.0/" + path,
+      type: "GET",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("Accept", "application/json")
+        xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+      }
+    })
+  }
+
+  function whenPageLoaded(callback) {
+    if (document.readyState != "loading") {
+      callback();
+    }
+    else if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", callback);
+    }
+    else {
+      document.attachEvent("onreadystatechange", function() {
+        if (document.readyState == "complete") {
+          callback();
+        }
+      })
+    }
+  }
+</script>

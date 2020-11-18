@@ -10,26 +10,12 @@
       width: 100%;
       overflow: hidden;
     }
-    .card {
-      margin: 10px;
-      padding: 20px;
-      border: solid 1px #ddd;
-    }
     .innerbox {
       border: solid 1px #ddd;
       padding: 4px; 8px;
       display: flex;
       justify-content: space-between;
       width: 100%;
-    }
-    .screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: rgba(169,169,169,0.5);
-      width: 100%;
-      height: 100%;
-      z-index: 10;
     }
     .progressbox {
       position: absolute;
@@ -44,28 +30,8 @@
       padding: 25px;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     }
-    button.close {
-      position: absolute;
-      padding: 0 4px;
-      background: white;
-      color: black;
-      border: none;
-      font-Size: 16px;
-      font-Family: Arial;
-      height: 25px;
-      top: 6px;
-      right: 6px;
-      border-Radius: 4px;
-      border: solid 1px white;
-    }
     .val {
       color: #44c;
-    }
-    .error {
-      color: #c00;
-    }
-    .title {
-      text-transform: capitalize;
     }
   </style>
 {% endblock load-first %}
@@ -75,48 +41,78 @@
   {% include "header.html" %}
   <div style="text-align: center; margin: 40px auto 0; width: 520px;">
     <div class="card">
-      <form name="parts">
-        <h3>Parts</h3>
-        <div class="innerbox">
-          <div>PartNumber</div>
-          <div>PartType</div>
-          <div>Title</div>
-          <div>CostPriceRange</div>
-          <div>Manufacturer</div>
-        </div>
-        <div style="margin: 4px;">
+      <h3>Parts</h3>
+      <div class="innerbox">
+        <div>PartNumber</div>
+        <div>PartType</div>
+        <div>Title</div>
+        <div>CostPriceRange</div>
+        <div>Manufacturer</div>
+      </div>
+      <section>
+        <form class="download" name="parts">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="parts">
+        <section>
           <input type="file" name="file" accept="text/csv" required="required"></input>
-        </div>
-        <div><button type="submit">Upload Parts CSV</button></div>
+        </section>
+        <section>
+          <button type="submit">Upload Parts CSV</button>
+        </section>
       </form>
     </div>
     <div class="card">
-      <form name="prices">
-        <h3>Price Data</h3>
-        <div class="innerbox">
-          <div>Date</div>
-          <div>Website</div>
-          <div>PartNumber</div>
-          <div>PartPrice</div>
-        </div>
-        <div style="margin: 4px;">
+      <h3>Price Data</h3>
+      <div class="innerbox">
+        <div>Date</div>
+        <div>Website</div>
+        <div>PartNumber</div>
+        <div>PartPrice</div>
+      </div>
+      <section>
+        <form class="download" name="prices">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="prices">
+        <section>
           <input type="file" name="file" accept="text/csv" required="required"></input>
-        </div>
-        <div><button type="submit">Upload Prices CSV</button></div>
+        </section>
+        <section>
+          <button type="submit">Upload Prices CSV</button>
+        </section>
       </form>
     </div>
     <div class="card">
-      <form name="costs">
-        <h3>Cost Data</h3>
-        <div class="innerbox">
-          <div>Date</div>
-          <div>PartNumber</div>
-          <div>Cost</div>
-        </div>
-        <div style="margin: 4px;">
+      <h3>Cost Data</h3>
+      <div class="innerbox">
+        <div>Date</div>
+        <div>PartNumber</div>
+        <div>Cost</div>
+      </div>
+      <section>
+        <form class="download" name="costs">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="costs">
+        <section>
           <input type="file" name="file" accept="text/csv" required="required"></input>
-        </div>
-        <div><button type="submit">Upload Costs CSV</button></div>
+        </section>
+        <section>
+          <button type="submit">Upload Costs CSV</button>
+        </section>
       </form>
     </div>
   </div>
@@ -136,26 +132,6 @@
 {% block load-last %}
 <script type="text/javascript">
 (function() {
-
-  function getJwtToken() {
-    return $("config[name='jwt']").attr("value")
-  }
-
-  function whenPageLoaded(callback) {
-    if (document.readyState != "loading") {
-      callback();
-    }
-    else if (document.addEventListener) {
-      document.addEventListener("DOMContentLoaded", callback);
-    }
-    else {
-      document.attachEvent("onreadystatechange", function() {
-        if (document.readyState == "complete") {
-          callback();
-        }
-      })
-    }
-  }
 
   function postFile(file, itemType) {
     var url = "/api/1.0/" + itemType;
@@ -215,8 +191,8 @@
     })
   }
 
-  whenPageLoaded(function() {
-    $("form").on("submit", function(event) {
+  function activateUploadForms() {
+    $("form.upload").on("submit", function(event) {
       event.preventDefault()
 
       var $form = $(this)
@@ -231,6 +207,19 @@
       updateProgressBoxText({ itemLabel: itemType, error: "", status: "starting" }, true)
       $(".screen").show()
     })
+  }
+
+  function activateDownloadForms() {
+    $("form.download").on("submit", function(event) {
+      event.preventDefault()
+      getData(this.getAttribute("name") + "?manufacturer=" + this.manufacturer.value)
+        .done(function(data) {
+          console.log(data);
+        })
+    })
+  }
+
+  function activateCloseButton() {
     $("button.close")
       .on("click", function() {
         $(".screen").hide()
@@ -241,6 +230,23 @@
       .on("mouseleave", function() {
         this.style.borderColor = "white";
       })
+  }
+
+  function populateManufacturerOptions() {
+    const TEMPLATE = "<option value='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} name {% templatetag closevariable %}</option>";
+    getData("manufacturer").done(function(data) {
+      select = $("select[name='manufacturer']")
+      for (var i = 0; i < data.length; ++i) {
+        select.append($(Mustache.render(TEMPLATE, data[i])))
+      }
+    })
+  }
+
+  whenPageLoaded(function() {
+    activateUploadForms()
+    activateDownloadForms()
+    activateCloseButton()
+    populateManufacturerOptions()
   })
 })();
 </script>
