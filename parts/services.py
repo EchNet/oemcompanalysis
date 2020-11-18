@@ -93,6 +93,7 @@ class PartsLoader(GenericLoader):
     keys["part_number"] = data["partnumber"]
     fields["part_type"] = data["parttype"]
     fields["cost_price_range"] = data["costpricerange"]
+    fields["title"] = data["title"]
     fields["manufacturer"] = Manufacturer.objects.get(name=data["manufacturer"])
     return keys, fields
 
