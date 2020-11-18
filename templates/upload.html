@@ -212,9 +212,17 @@
   function activateDownloadForms() {
     $("form.download").on("submit", function(event) {
       event.preventDefault()
-      getData(this.getAttribute("name") + "?manufacturer=" + this.manufacturer.value)
+      var name = this.getAttribute("name")
+      getData(name + "?manufacturer=" + this.manufacturer.value)
         .done(function(data) {
-          console.log(data);
+          var url = URL.createObjectURL(new Blob([data], { type: "text/csv" }));
+          var a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = name + ".csv";
+          document.body.appendChild(a);
+          a.click();
+          URL.revokeObjectURL(url);
         })
     })
   }
