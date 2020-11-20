@@ -67,7 +67,7 @@ class PartType(object):
 
 
 class CostPriceRange(object):
-  VALUES = ("0-50", "50-100", "100-150", "150-200", "200-300", "300-500", "500+", "500-1000",
+  VALUES = ("0-50", "50-100", "100-150", "150-200", "200-250", "250-500", "500+", "500-1000",
             "1000-2000", "2000+")
   DEFAULT = VALUES[0]
   CHOICES = ((v, v) for v in VALUES)
