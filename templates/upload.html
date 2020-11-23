@@ -120,9 +120,10 @@
   <div class="screen" style="display: none;">
     <div class="progressbox">
       <button class="close">&#x2715;</button>
-      <div>Upload status: <span class="subst val" name="status"></span></div>
+      <div><b>Upload <span class="subst title" name="itemLabel"></span></b></div>
+      <div>Status: <span class="subst val" name="status"></span></div>
       <div>Rows processed: <span class="subst val" name="rows_processed"></span></div>
-      <div><span class="subst title" name="itemLabel"></span> added: <span class="subst val" name="objects_added"></span></div>
+      <div>Items added: <span class="subst val" name="objects_added"></span></div>
       <div>Errors:</div>
       <div style="padding-left: 30px;" class="subst error" name="errors"></div>
     </div>
@@ -154,8 +155,6 @@
   }
 
   function updateProgressBoxText(props, clear) {
-    console.log(props);
-
     $(".progressbox .subst").each(function() {
       var name = $(this).attr("name");
       if (name in props) {

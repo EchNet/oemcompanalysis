@@ -67,8 +67,6 @@ class GenericLoader:
       h = self.normalize_header(val)
       if h in self.KEY_FIELDS + self.FIELDS:
         mappings[h] = idx
-      else:
-        raise ValidationError(f"unrecognized header '{val}'")
 
     # Check that all fields are present.
     missing_fields = []

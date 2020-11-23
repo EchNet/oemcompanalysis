@@ -48,7 +48,7 @@ class PartsView(views.APIView):
   def post(self, request):
     file = request.FILES.get("file", None)
     string_data = file.read().decode("utf-8")
-    up = UploadProgress.objects.create(user=request.user, type="parts")
+    up = models.UploadProgress.objects.create(user=request.user, type="parts")
     tasks.run_parts_upload.delay(up.id, string_data)
     return Response({"progress_id": up.id})
 
@@ -76,7 +76,7 @@ class PricesView(views.APIView):
   def post(self, request):
     file = request.FILES.get("file", None)
     string_data = file.read().decode("utf-8")
-    up = UploadProgress.objects.create(user=request.user, type="prices")
+    up = models.UploadProgress.objects.create(user=request.user, type="prices")
     tasks.run_prices_upload.delay(up.id, string_data)
     return Response({"progress_id": up.id})
 
@@ -100,7 +100,7 @@ class CostsView(views.APIView):
   def post(self, request):
     file = request.FILES.get("file", None)
     string_data = file.read().decode("utf-8")
-    up = UploadProgress.objects.create(user=request.user, type="costs")
+    up = models.UploadProgress.objects.create(user=request.user, type="costs")
     tasks.run_costs_upload.delay(up.id, string_data)
     return Response({"progress_id": up.id})
 
