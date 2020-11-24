@@ -232,6 +232,15 @@ class UploadProgress(models.Model):
       verbose_name=_("user"),
   )
 
+  # Descriptive text
+  type = models.CharField(
+      blank=True,
+      db_index=False,
+      null=True,
+      max_length=SHORT_MAX_LENGTH,
+      verbose_name=_("type"),
+  )
+
   # Status: "running", "done", "error".
   status = models.CharField(
       blank=False,
@@ -244,3 +253,15 @@ class UploadProgress(models.Model):
   rows_processed = models.PositiveIntegerField(default=0)
   objects_added = models.PositiveIntegerField(default=0)
   errors = models.JSONField(blank=True, null=True)
+
+  created_at = models.DateTimeField(
+      auto_now_add=True,
+      editable=False,
+      verbose_name=_("created at"),
+  )
+
+  updated_at = models.DateTimeField(
+      auto_now=True,
+      editable=False,
+      verbose_name=_("updated at"),
+  )

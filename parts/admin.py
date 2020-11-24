@@ -62,7 +62,4 @@ class PartCostPointAdmin(admin.ModelAdmin):
 
 @admin.register(models.UploadProgress)
 class ProgressAdmin(admin.ModelAdmin):
-  list_display = (
-      "id",
-      "user",
-  )
+  list_display = ("created_at", "type", "user", "status")
