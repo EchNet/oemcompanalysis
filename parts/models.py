@@ -67,6 +67,8 @@ class PartType(object):
 
 
 class CostPriceRange(object):
+  # VALUES appear in display order.
+  # 500+ applies only to accessories, while 500-1000, 1000-2000 and 2000+ apply to parts.
   VALUES = ("0-50", "50-100", "100-150", "150-200", "200-250", "250-500", "500+", "500-1000",
             "1000-2000", "2000+")
   DEFAULT = VALUES[0]
