@@ -1,6 +1,10 @@
+from collections import OrderedDict
+
 from . import models
 
-from collections import OrderedDict
+
+def get_websites(website_filters={}):
+  return models.Website.objects.filter(**website_filters).order_by("domain_name")
 
 
 def get_parts_per_cost_price_range(part_filters={}):
@@ -23,5 +27,42 @@ def get_parts_per_cost_price_range(part_filters={}):
   return result
 
 
-def get_pricing_data_for_part_number_and_date(part_number, date):
-  pass
+def get_part_cost_for_date(part, date):
+  return models.PartCostPoint.objects.filter(
+      part=part, start_date__lte=date).order_by("-start_date").first()
+
+
+def get_part_pricing_on_date(part_filters, website_filters, date):
+  """
+    Example:
+    {
+      part_number: "XYZ-001",
+      cost: 50,
+      by_website: {
+        "parts1.com": { price: 55, markup: 0.10, rank: 1 },
+        "parts2.com": { price: 51, markup: 0.02, rank: 2 }
+      }
+    }
+  """
+  part = models.Part.objects.filter(**part_filters).get()
+  websites = models.Website.objects.filter(**website_filters)
+  prices = models.PartPrice.objects.filter(part=part,
+                                           date=date).values("price", "website__domain_name")
+  prices = list(prices)
+  prices = sorted(prices, key=lambda d: d.get("price"), reverse=True)
+  cost = get_part_cost_for_date(part, date)
+  by_website = {}
+  for pe in enumerate(prices):
+    p = pe[1]
+    p["rank"] = pe[0] + 1
+    if cost:
+      p["markup"] = (p["price"] - cost.cost) / cost.cost
+    domain_name = p.pop("website__domain_name")
+    by_website[domain_name] = p
+
+  result = {
+      "part_number": part.part_number,
+      "cost": cost.cost if cost else None,
+      "by_website": by_website
+  }
+  return result
