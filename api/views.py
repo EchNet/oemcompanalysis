@@ -3,11 +3,11 @@ import logging
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.utils import dateformat, timezone
-from rest_framework import generics, views
+from rest_framework import generics, serializers, views
 from rest_framework.response import Response
 
 from api import serializers as serializers
-from parts import models, tasks
+from parts import models, queries, tasks
 from utils.csv import render_to_response_as_csv
 
 logger = logging.getLogger(__name__)
@@ -24,24 +24,14 @@ class WebsiteView(generics.ListAPIView):
   serializer_class = serializers.WebsiteSerializer
 
   def get_queryset(self):
-    return models.Website.objects.all().order_by("domain_name")
-
-
-class ManufacturerWebsiteView(generics.ListAPIView):
-  serializer_class = serializers.WebsiteSerializer
-
-  def get_queryset(self):
-    manufacturer_id = self.kwargs.get("manufacturer_id")
-    manufacturer = get_object_or_404(models.Manufacturer.objects.all(), id=manufacturer_id)
-    return models.Website.objects.filter(
-        manufacturers__id=manufacturer_id).order_by("domain_name")
-
-
-class PartView(generics.ListAPIView):
-  serializer_class = serializers.PartSerializer
-
-  def get_queryset(self):
-    return models.Part.objects.all().order_by("part_number")
+    filters = {}
+    m = self.request.GET.get("m", None)
+    if m is not None:
+      if m.isnumeric():
+        filters["manufacturers__id"] = m
+      else:
+        filters["manufacturers__name"] = m
+    return queries.get_websites(filters)
 
 
 class PartsView(views.APIView):
@@ -131,13 +121,29 @@ class ProgressView(views.APIView):
     })
 
 
-class ReportView(views.APIView):
+class PartsPerCostPriceRangeView(views.APIView):
   def get(self, request, *args, **kwargs):
-    manufacturer_id = request.GET.get("manufacturer")
-    manufacturer = get_object_or_404(models.Manufacturer.objects.all, id=manufacturer_id)
-    part_type = request.GET.get("parttype")
-    if part_type not in [c[0] for c in models.PartType.CHOICES]:
-      raise ValueError(part_type)
+    part_filters = {}
+    m = self.request.GET.get("m", None)
+    if m is not None:
+      if m.isnumeric():
+        part_filters["manufacturer_id"] = m
+      else:
+        part_filters["manufacturer__name"] = m
+    t = self.request.GET.get("t", None)
+    if t is not None:
+      if t not in [c[0] for c in models.PartType.CHOICES]:
+        raise serializers.ValidationError(f"{t}: invalid part type")
+      part_filters["part_type"] = t
+    return Response(queries.get_parts_per_cost_price_range(part_filters))
+
+
+class PartPricingOnDateView(views.APIView):
+  def get(self, request, *args, **kwargs):
+    part_filters = {"part_number": self.kwargs.get("part_number")}
+    website_filters = {}
     date = (timezone.now() - timedelta(days=1)).date()
-    Part.objects.filter(manufacturer=manufacturer, part_type=part_type)
-    return Response({})
+    d = request.GET.get("d", None)
+    if d is not None:
+      date = datetime.strptime(d, "Y-m-d")
+    return Response(queries.get_part_pricing_on_date(part_filters, website_filters, date))

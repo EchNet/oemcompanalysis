@@ -6,6 +6,9 @@
   <div style="margin: 40px; width: 480px; display: flex; justify-content: space-evenly; align-items: center;">
     <div class="manufacturer-select-container"></div>
     <div class="parttype-select-container"></div>
+    <div class="date-select-container>
+      <input class="datepicker" placeholder="Date: YYYY-MM-DD"/>
+    </div>
     <button class="run-button" type="button" disabled="disabled">RUN</button>
   </div>
   <div style="display: flex; padding: 40px">
@@ -17,6 +20,10 @@
 {% block load-last %}
 <script type="text/javascript">
 (function() {
+  $("input.datepicker").datepicker({
+    format: "yyyy-mm-dd"
+  });
+
   // Selectors
   var MANUFACTURER_SELECT = ".manufacturer-select-container select";
   var PARTTYPE_SELECT = ".parttype-select-container select";
@@ -77,8 +84,12 @@
     $("button.run-button").on("click", function() {
       currentManufacturer = $(MANUFACTURER_SELECT).val()
       currentPartType = $(PARTTYPE_SELECT).val()
-      getData("manufacturer/" + currentManufacturer + "/website").done(function(data) {
+      getData("website?m=" + currentManufacturer).done(function(data) {
+        console.log(data);
         renderWebsiteList($(WEBSITE_LIST_CONTAINER), data)
+      })
+      getData("parts/per_cost_price_range?m=" + currentManufacturer + "&t=" + currentPartType).done(function(data) {
+        console.log(data);
       })
     })
   }
