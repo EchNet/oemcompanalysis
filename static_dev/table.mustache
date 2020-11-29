@@ -33,9 +33,9 @@
     <tr class="website-row">
       <td class="website-header">{{domain_name}}</td>
       {{#ranges}}
-        <td class="data-cell price">XXX</th>
-        <td class="data-cell markup">+Y</th>
-        <td class="data-cell rank">Z</th>
+        <td class="data-cell price" data-range="{{range}}" data-website="{{domain_name}}"></td>
+        <td class="data-cell markup" data-range="{{range}}" data-website="{{domain_name}}"></td>
+        <td class="data-cell rank" data-range="{{range}}" data-website="{{domain_name}}"></td>
       {{/ranges}}
     </tr>
     {{/websites}}

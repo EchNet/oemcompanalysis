@@ -1,6 +1,6 @@
 import logging
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
 from django.utils import dateformat, timezone
 from rest_framework import generics, serializers, views
@@ -145,5 +145,5 @@ class PartPricingOnDateView(views.APIView):
     date = (timezone.now() - timedelta(days=1)).date()
     d = request.GET.get("d", None)
     if d is not None:
-      date = datetime.strptime(d, "Y-m-d")
+      date = datetime.strptime(d, "%Y-%m-%d")
     return Response(queries.get_part_pricing_on_date(part_filters, website_filters, date))
