@@ -1,18 +1,49 @@
 {% extends "base.html" %}
 
+{% block load-first %}
+  {{ block.super }}
+  <style>
+    div.top-controls {
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+    select {
+      padding: 3px;
+    }
+    select, option {
+      font-size: 16px;
+    }
+    input.datepicker {
+      width: 110px;
+      padding: 0 5px;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-  <config name="jwt" value="{{token}}"></config>
   {% include "header.html" %}
-  <div style="margin: 40px; width: 480px; display: flex; justify-content: space-evenly; align-items: center;">
-    <div class="manufacturer-select-container"></div>
-    <div class="parttype-select-container"></div>
-    <div class="date-select-container>
-      <input class="datepicker" placeholder="Date: YYYY-MM-DD"/>
+  <div class="top-controls">
+    <div class="manufacturer-select-container">
+      <select>
+        <option value=''>Select a manufacturer</option>
+      </select>
+    </div>
+    <div class="parttype-select-container">
+      <select>
+        <option value=''>Select a type</option>
+        {% for t in PartType.CHOICES %}
+          <option value='{{ t.0 }}'>{{ t.1 }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="date-select-container">
+      <input type="text" class="datepicker" value="{{ yesterday }}">
     </div>
     <button class="run-button" type="button" disabled="disabled">RUN</button>
   </div>
-  <div style="display: flex; padding: 40px">
-    <div class="website-list-container"></div>
+  <div class="table-container">
   </div>
   <footer></footer>
 {% endblock content %}
@@ -20,7 +51,7 @@
 {% block load-last %}
 <script type="text/javascript">
 (function() {
-  $("input.datepicker").datepicker({
+  $(".datepicker").datepicker({
     format: "yyyy-mm-dd"
   });
 
@@ -28,17 +59,22 @@
   var MANUFACTURER_SELECT = ".manufacturer-select-container select";
   var PARTTYPE_SELECT = ".parttype-select-container select";
   var RUN_BUTTON = "button.run-button";
-  var WEBSITE_LIST_CONTAINER = "div.website-list-container";
+  var TABLE_CONTAINER = "div.table-container";
 
   // State
   var currentManufacturer;
   var currentPartType;
+  var websites = [];
+  var ranges = [];
+  var tableTemplate = null;
 
   function onFilterChange() {
     var manufacturer = $(MANUFACTURER_SELECT).val();
     var partType = $(PARTTYPE_SELECT).val();
     if (manufacturer != currentManufacturer || partType != currentPartType) {
-      resetReport()
+      websites = []
+      ranges = []
+      renderTable()
     }
     if (!!manufacturer && !!partType) {
       $(RUN_BUTTON).removeAttr("disabled");
@@ -48,58 +84,58 @@
     }
   }
 
-  function resetReport() {
-    $(WEBSITE_LIST_CONTAINER).empty()
-  }
-
-  function renderManufacturerSelect(div, data) {
+  function renderManufacturerSelect(select, data) {
     const TEMPLATE = "<option value ='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} name {% templatetag closevariable %}</option>";
-    select = $("<select>")
-    select.append($("<option value=''>Select a manufacturer</option>"))
-    div.append(select)
     for (var i = 0; i < data.length; ++i) {
       select.append($(Mustache.render(TEMPLATE, data[i])))
     }
-    select.on("change", onFilterChange)
   }
 
-  function renderPartTypeSelect(div, data) {
-    select = $("<select>")
-    select.append($("<option value=''>Select a type</option>"))
-    div.append(select)
-    {% for t in PartType.CHOICES %}
-      select.append($("<option value='{{ t.0 }}'>").text("{{ t.1 }}"))
-    {% endfor %}
-    select.on("change", onFilterChange)
-  }
-
-  function renderWebsiteList(div, data) {
-    const TEMPLATE = "<li data-value='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} domain_name {% templatetag closevariable %}</li>";
-    for (var i = 0; i < data.length; ++i) {
-      div.append($(Mustache.render(TEMPLATE, data[i])))
+  function loadWebsites() {
+    var selectedManufacturer = $(MANUFACTURER_SELECT).val()
+    var selectedPartType = $(PARTTYPE_SELECT).val()
+    if (selectedManufacturer != currentManufacturer || selectedPartType != currentPartType) {
+      currentManufacturer = selectedManufacturer;
+      currentPartType = selectedPartType;
+      getData("website?m=" + currentManufacturer).done(function(data) {
+        websites = data;
+        renderTable()
+        loadPartsPerCostPriceRange()
+      })
     }
   }
 
-  function wireRunButton() {
-    $("button.run-button").on("click", function() {
-      currentManufacturer = $(MANUFACTURER_SELECT).val()
-      currentPartType = $(PARTTYPE_SELECT).val()
-      getData("website?m=" + currentManufacturer).done(function(data) {
-        console.log(data);
-        renderWebsiteList($(WEBSITE_LIST_CONTAINER), data)
-      })
-      getData("parts/per_cost_price_range?m=" + currentManufacturer + "&t=" + currentPartType).done(function(data) {
-        console.log(data);
-      })
+  function renderTable() {
+    if (!tableTemplate) {
+      $.get("/static/table.mustache").done(function(data) {
+        console.log(data)
+        tableTemplate = data;
+        renderTable()
+      });
+    }
+    else {
+      console.log({ ranges: ranges, websites: websites });
+      tableHtml = Mustache.render(tableTemplate, { ranges: ranges, websites: websites });
+      console.log(tableHtml);
+      $(TABLE_CONTAINER).empty().append($(tableHtml))
+    }
+  }
+
+  function loadPartsPerCostPriceRange() {
+    getData("parts/per_cost_price_range?m=" + currentManufacturer + "&t=" + currentPartType).done(function(data) {
+      console.log(data);
+      ranges = data;
+      renderTable();
     })
   }
 
   whenPageLoaded(function() {
     getData("manufacturer").done(function(data) {
-      renderManufacturerSelect($(".manufacturer-select-container"), data)
+      renderManufacturerSelect($(MANUFACTURER_SELECT), data)
     })
-    renderPartTypeSelect($(".parttype-select-container"))
-    wireRunButton()
+    $(PARTTYPE_SELECT).on("change", onFilterChange)
+    $(MANUFACTURER_SELECT).on("change", onFilterChange)
+    $(RUN_BUTTON).on("click", loadWebsites)
   })
 })();
 </script>

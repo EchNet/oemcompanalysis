@@ -1,0 +1,43 @@
+<table class="oemca-table">
+  <thead>
+    <tr class="range-header-row">
+      <th></th>
+      {{#ranges}}
+        <th class="range-header" colspan="3">{{range}}</th>
+      {{/ranges}}
+    </tr>
+    <tr class="range-partselect-row">
+      <th></th>
+      {{#ranges}}
+        <th class="range-partselect" colspan="3">
+          <select data-range="{{range}}">
+          {{#parts}}
+            <option>{{.}}</option>
+          {{/parts}}
+          </select>
+        </th>
+      {{/ranges}}
+      </select>
+    </tr>
+    <tr class="range-subheader-row">
+      <th></th>
+      {{#ranges}}
+        <th class="range-subheader price">Price</th>
+        <th class="range-subheader markup">+%</th>
+        <th class="range-subheader rank">Rank</th>
+      {{/ranges}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#websites}}
+    <tr class="website-row">
+      <td class="website-header">{{domain_name}}</td>
+      {{#ranges}}
+        <td class="data-cell price">XXX</th>
+        <td class="data-cell markup">+Y</th>
+        <td class="data-cell rank">Z</th>
+      {{/ranges}}
+    </tr>
+    {{/websites}}
+  </tbody>
+</table>

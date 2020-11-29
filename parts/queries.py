@@ -10,8 +10,8 @@ def get_websites(website_filters={}):
 def get_parts_per_cost_price_range(part_filters={}):
   """
     Example:
-      { "100-200": [ "XYZ-001", "ABC-002" ],
-        "200-250": [ "XYZ-002", "ABC-003" ] }
+      { { range: "100-200", parts: [ "XYZ-001", "ABC-002" ] },
+        { range: "200-250", parts: [ "XYZ-002", "ABC-003" ] } }
     Result is OrderedDict. CostPriceRange keys appear in display order.
   """
   values = models.Part.objects.filter(**part_filters).values(
@@ -19,12 +19,12 @@ def get_parts_per_cost_price_range(part_filters={}):
   cost_price_ranges = list(set(pair["cost_price_range"] for pair in values))
   cost_price_range_order = {p[1]: p[0] for p in enumerate(models.CostPriceRange.VALUES)}
   cost_price_ranges = sorted(cost_price_ranges, key=lambda cpr: cost_price_range_order[cpr])
-  result = OrderedDict()
+  lookup = OrderedDict()
   for cpr in cost_price_ranges:
-    result[cpr] = []
+    lookup[cpr] = []
   for pair in values:
-    result[pair["cost_price_range"]].append(pair["part_number"])
-  return result
+    lookup[pair["cost_price_range"]].append(pair["part_number"])
+  return [{"range": k, "parts": v} for k, v in lookup.items()]
 
 
 def get_part_cost_for_date(part, date):

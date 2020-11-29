@@ -1,6 +1,8 @@
 import logging
 
+from datetime import timedelta
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.views.generic import TemplateView
 from rest_framework_jwt.settings import api_settings as jwt_api_settings
 
@@ -18,6 +20,7 @@ class PageView(TemplateView):
     context.update({
         "user": self.request.user,
         "token": self.get_token(),
+        "yesterday": (timezone.now() - timedelta(days=1)).strftime("%Y-%m-%d"),
     })
     return context
 
