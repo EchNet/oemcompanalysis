@@ -32,7 +32,7 @@ def get_part_cost_for_date(part, date):
       part=part, start_date__lte=date).order_by("-start_date").first()
 
 
-def get_part_pricing_on_date(part_filters, website_filters, date):
+def get_part_pricing_on_date(part_filters, date):
   """
     Example:
     {
@@ -45,7 +45,6 @@ def get_part_pricing_on_date(part_filters, website_filters, date):
     }
   """
   part = models.Part.objects.filter(**part_filters).get()
-  websites = models.Website.objects.filter(**website_filters)
   prices = models.PartPrice.objects.filter(part=part,
                                            date=date).values("price", "website__domain_name")
   prices = list(prices)

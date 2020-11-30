@@ -141,9 +141,11 @@ class PartsPerCostPriceRangeView(views.APIView):
 class PartPricingOnDateView(views.APIView):
   def get(self, request, *args, **kwargs):
     part_filters = {"part_number": self.kwargs.get("part_number")}
-    website_filters = {}
-    date = (timezone.now() - timedelta(days=1)).date()
     d = request.GET.get("d", None)
     if d is not None:
-      date = datetime.strptime(d, "%Y-%m-%d")
-    return Response(queries.get_part_pricing_on_date(part_filters, website_filters, date))
+      date = datetime.strptime(d, "%Y-%m-%d").date()
+    else:
+      date = (timezone.now() - timedelta(days=1)).date()
+    result = queries.get_part_pricing_on_date(part_filters, date)
+    logger.info(f"Part filters={part_filters} date={date}: result={result}")
+    return Response(result)

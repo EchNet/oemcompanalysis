@@ -77,26 +77,19 @@
   var tableTemplate = null;
 
   function onFilterChange() {
-    var manufacturer = $(MANUFACTURER_SELECT).val();
-    var partType = $(PARTTYPE_SELECT).val();
-    if (manufacturer != currentManufacturer || partType != currentPartType) {
-      websites = []
-      ranges = []
-      renderTable()
-    }
-    if (!!manufacturer && !!partType) {
+    currentManufacturer = $(MANUFACTURER_SELECT).val();
+    currentPartType = $(PARTTYPE_SELECT).val();
+    currentDate = $(DATE_PICKER).val();
+
+    websites = []
+    ranges = []
+    renderTable()
+
+    if (!!currentManufacturer && !!currentPartType) {
       $(RUN_BUTTON).removeAttr("disabled");
     }
     else {
       $(RUN_BUTTON).attr("disabled", "disabled");
-    }
-  }
-
-  function onDateChange() {
-    var selectedDate = $(DATE_PICKER).val();
-    if (selectedDate != currentDate) {
-      $(".data-cell").text("");
-      currentDate = selectedDate;
     }
   }
 
@@ -108,17 +101,11 @@
   }
 
   function loadWebsites() {
-    var selectedManufacturer = $(MANUFACTURER_SELECT).val()
-    var selectedPartType = $(PARTTYPE_SELECT).val()
-    if (selectedManufacturer != currentManufacturer || selectedPartType != currentPartType) {
-      currentManufacturer = selectedManufacturer;
-      currentPartType = selectedPartType;
-      getData("website?m=" + currentManufacturer).done(function(data) {
-        websites = data;
-        renderTable()
-        loadPartsPerCostPriceRange()
-      })
-    }
+    getData("website?m=" + currentManufacturer).done(function(data) {
+      websites = data;
+      renderTable()
+      loadPartsPerCostPriceRange()
+    })
   }
 
   function renderTable() {
@@ -169,6 +156,7 @@
     })
     $(PARTTYPE_SELECT).on("change", onFilterChange)
     $(MANUFACTURER_SELECT).on("change", onFilterChange)
+    $(DATE_PICKER).on("change", onFilterChange)
     $(RUN_BUTTON).on("click", loadWebsites)
   })
 })();
