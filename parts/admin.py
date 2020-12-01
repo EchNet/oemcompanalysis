@@ -19,6 +19,7 @@ class WebsiteAdmin(admin.ModelAdmin):
       "id",
       "domain_name",
   )
+  list_filter = ("is_active", )
   search_fields = ("domain_name", )
 
 

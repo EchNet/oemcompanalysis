@@ -46,7 +46,9 @@ INSTALLED_APPS = (
     'import_export',
 
     # custom apps
-    "parts")
+    "parts",
+    "spider",
+)
 
 MIDDLEWARE = (
     'corsheaders.middleware.CorsMiddleware',
@@ -203,6 +205,13 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_WORKER_CONCURRENCY = 2
 CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_BEAT_SCHEDULE = {
+    "celery.backend_cleanup": {
+        "task": "spider.tasks.run_full_scrape",
+        "schedule": crontab(minute="0", hour="1"),  # every day at 1am
+        "options": {
+            "expires": 30 * 60  # seconds
+        }
+    },
     "celery.backend_cleanup": {
         "task": "celery.backend_cleanup",
         "schedule": crontab(minute="0", hour="*"),  # every hour

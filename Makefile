@@ -13,8 +13,6 @@ CELERY=celery
 
 .DEFAULT_GOAL: test
 
-test: djtest rtest
-
 requirements.txt: requirements.in
 	$(PIP) install -r requirements.in
 	echo "# GENERATED FROM requirements.in.  DO NOT EDIT DIRECTLY." > requirements.txt

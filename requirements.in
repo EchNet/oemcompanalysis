@@ -23,6 +23,7 @@ python-decouple
 python-dotenv
 python-jose
 raven
+scrapy
 unicodecsv
 wheel
 whitenoise

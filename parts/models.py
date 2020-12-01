@@ -50,10 +50,20 @@ class Website(models.Model):
   )
 
   # When did entry of data from this site start?
-  start_date = models.DateField(blank=False,
-                                null=False,
-                                default=datetime.date.today,
-                                verbose_name=("start date"))
+  start_date = models.DateField(
+      auto_now_add=True,
+      blank=False,
+      null=False,
+      verbose_name=("start date"),
+  )
+
+  # Was this site still reachable, last we checked?
+  is_active = models.BooleanField(
+      blank=False,
+      null=False,
+      default=True,
+      verbose_name=_("is active"),
+  )
 
   def __str__(self):
     return self.domain_name
