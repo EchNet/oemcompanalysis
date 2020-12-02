@@ -12,11 +12,11 @@ logger = logging.getLogger(__name__)
 @shared_task
 def run_full_scrape():
   services.update_website_list()
-  for website in parts_queries.get_websites({"active": True}):
+  for website in parts_queries.get_websites({"is_active": True}):
     run_website_scrape.delay(website.id)
 
 
 @shared_task
 def run_website_scrape(website_id):
-  website = parts_models.Website.objects.get(website_id)
-  logger.info("run_website_scrape", 
+  website = parts_models.Website.objects.get(id=website_id)
+  logger.info(f"run_website_scrape: {website}")
