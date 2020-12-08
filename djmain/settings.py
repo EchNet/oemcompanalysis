@@ -205,7 +205,7 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_WORKER_CONCURRENCY = 2
 CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_BEAT_SCHEDULE = {
-    "celery.backend_cleanup": {
+    "nightly": {
         "task": "spider.tasks.run_full_scrape",
         "schedule": crontab(minute="0", hour="1"),  # every day at 1am
         "options": {
