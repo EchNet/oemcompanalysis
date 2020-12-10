@@ -2,6 +2,19 @@ import re, scrapy
 from datetime import datetime, timedelta
 
 
+class NullSpider(scrapy.Spider):
+  """ Temporary, for testing. """
+  name = 'null'
+  start_urls = []
+
+  def __init__(self, *args, **kwargs):
+    self.start_urls = kwargs.pop("start_urls", self.start_urls)
+    super().__init__(*args, **kwargs)
+
+  def parse(self, response):
+    pass
+
+
 class WebsiteSeedSpider(scrapy.Spider):
   name = 'website_seed'
   start_urls = ['https://viewdns.info/reverseip/?host=34.199.110.134&t=1']
