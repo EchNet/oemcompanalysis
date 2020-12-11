@@ -35,3 +35,41 @@ class SeedPage(models.Model):
       max_length=METHOD_MAX_LENGTH,
       verbose_name=_("method"),
   )
+
+
+class WebsiteCrawl(models.Model):
+
+  # The website we're reporting on.
+  website = models.ForeignKey(
+      blank=False,
+      db_index=True,
+      null=False,
+      on_delete=models.CASCADE,
+      related_name="crawls",
+      to="parts.Website",
+      verbose_name=_("website"),
+  )
+
+  # The set of manufacturers uncovered by this crawl.
+  manufacturers = models.ManyToManyField(
+      to="parts.Manufacturer",
+      verbose_name=_("manufacturers"),
+  )
+
+  # Site has no data.
+  site_down = models.BooleanField(
+      blank=True,
+      default=False,
+      null=False,
+      verbose_name=_("site is down"),
+  )
+
+  # What went wrong (normally empty).
+  error = models.TextField(verbose_name=_("error"))
+
+  # When created.
+  created_at = models.DateTimeField(
+      auto_now_add=True,
+      editable=False,
+      verbose_name=_("created at"),
+  )

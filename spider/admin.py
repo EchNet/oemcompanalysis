@@ -9,3 +9,11 @@ class SeedPageAdmin(admin.ModelAdmin):
       "url",
       "type",
   )
+
+
+@admin.register(models.WebsiteCrawl)
+class WebsiteCrawlAdmin(admin.ModelAdmin):
+  list_display = (
+      "website",
+      "created_at",
+  )

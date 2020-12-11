@@ -1,4 +1,5 @@
-import logging
+import logging, requests
+import requests.exceptions
 
 from billiard.context import Process
 from scrapy.crawler import Crawler
@@ -54,6 +55,7 @@ class WebsiteSeedAccumulator:
 
 
 def update_website_list():
+  """ Update the list of websites to crawl. """
   start_urls = list(models.SeedPage.objects.filter(type="website").values_list("url", flat=True))
   run_crawler_process(
       spiders.WebsiteSeedSpider(start_urls=start_urls),
@@ -62,8 +64,46 @@ def update_website_list():
 
 
 def crawl_website(website):
-  start_urls = [f"https://{website.domain_name}/sitemap"]
-  run_crawler_process(
-      spiders.NullSpider(start_urls=start_urls),
-      WebsiteSeedAccumulator(),
-  )
+  """ Verify that the given website is still active and update its list of manufacturers. """
+  website_crawl = models.WebsiteCrawl(website=website)
+
+  def check_home():
+    home_url = f"https://www.{website.domain_name}"
+    try:
+      res = requests.get(home_url)
+      conn_error = False
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError) as e:
+      website_crawl.error = str(e)
+      conn_error = True
+    if conn_error or res.status_code != 301:  # Expected behavior is to redirect to https:
+      website_crawl.site_down = True
+      website.is_active = False
+      website.save()
+      return False
+    return True
+
+  def parse_makes(makes):
+    manufacturers = set()
+    for m in makes:
+      manufacturer = parts_models.Manufacturer.objects.filter(name=m.get("ui", "")).first()
+      if manufacturer:
+        manufacturers.add(manufacturer)
+    return manufacturers
+
+  def find_manufacturers():
+    makes_url = f"https://www.{website.domain_name}/ajax/vehicle-picker/makes/all"
+    res = requests.get(makes_url)
+    if res.status_code != 200:
+      website_crawl.error = f"GET {makes_url} status code {res.status_code}"
+    else:
+      try:
+        return parse_makes(res.json())
+      except Exception as e:
+        website_crawl.error = str(e)
+
+  manufacturers = find_manufacturers() if check_home() else None
+
+  website_crawl.save()
+  if manufacturers is not None:
+    website.manufacturers_set.set(manufacturers)
+    website_crawl.manufacturers_set.set(manufacturers)
