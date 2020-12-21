@@ -206,7 +206,7 @@ CELERY_WORKER_CONCURRENCY = 2
 CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_BEAT_SCHEDULE = {
     "nightly": {
-        "task": "spider.tasks.run_full_scrape",
+        "task": "spider.tasks.run_full_crawl",
         "schedule": crontab(minute="0", hour="1"),  # every day at 1am
         "options": {
             "expires": 30 * 60  # seconds

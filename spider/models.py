@@ -1,9 +1,28 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+IP_MAX_LENGTH = 20
 TYPE_MAX_LENGTH = 16
 URL_MAX_LENGTH = 120
 METHOD_MAX_LENGTH = 60
+
+
+class WebProxy(models.Model):
+
+  # The IP address.
+  ip = models.CharField(
+      blank=False,
+      null=False,
+      max_length=IP_MAX_LENGTH,
+      verbose_name=_("IP address"),
+  )
+
+  # When created.
+  created_at = models.DateTimeField(
+      auto_now_add=True,
+      editable=False,
+      verbose_name=_("created at"),
+  )
 
 
 class SeedPage(models.Model):
