@@ -3,21 +3,20 @@
     <tr class="range-header-row">
       <th></th>
       {{#ranges}}
-        <th class="range-header" colspan="3">{{range}}</th>
+        <th class="range-header" colspan="3">${{range}}</th>
       {{/ranges}}
     </tr>
     <tr class="range-partselect-row">
       <th></th>
       {{#ranges}}
         <th class="range-partselect" colspan="3">
-          <select data-range="{{range}}">
+          <select class="product-choice" data-range="{{range}}">
           {{#parts}}
             <option>{{.}}</option>
           {{/parts}}
           </select>
         </th>
       {{/ranges}}
-      </select>
     </tr>
     <tr class="range-subheader-row">
       <th></th>

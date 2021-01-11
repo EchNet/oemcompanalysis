@@ -3,17 +3,22 @@
 {% block load-first %}
   {{ block.super }}
   <style>
+    body {
+      font-size: 12px;
+    }
     div.top-controls {
-      margin-top: 4px;
       display: flex;
       justify-content: space-evenly;
       align-items: center;
+      padding: 12px;
+      border-bottom: ridge 3px #ca2;
+      background-color: #efb02a;
     }
     select {
       padding: 3px;
     }
     select, option {
-      font-size: 16px;
+      font-size: 12px;
     }
     input.datepicker {
       width: 110px;
@@ -24,6 +29,33 @@
     }
     div.table-container {
       overflow-x: scroll;
+      padding: 12px;
+    }
+    tr.range-subheader-row {
+      border-bottom: solid 1px #ca2;
+    }
+    tr.website-row:nth-child(odd) {
+      background-color: #f0f0f0;
+    }
+    .data-cell {
+      text-align: right;
+      padding: 2px 3px 2px 0;
+    }
+    .website-header {
+      text-align: center;
+      padding: 2px 3px;
+    }
+    .website-header, .data-cell.rank {
+      border-right: solid 3px white;
+    }
+    .data-cell.price {
+      background-color: rgba(255,248,243,0.5);
+    }
+    .data-cell.markup {
+      background-color: rgba(243,255,248,0.5);
+    }
+    .data-cell.rank {
+      background-color: rgba(250,243,253,0.5);
     }
   </style>
 {% endblock %}
@@ -38,7 +70,6 @@
     </div>
     <div class="parttype-select-container">
       <select>
-        <option value=''>Select a type</option>
         {% for t in PartType.CHOICES %}
           <option value='{{ t.0 }}'>{{ t.1 }}</option>
         {% endfor %}
@@ -47,7 +78,7 @@
     <div class="date-select-container">
       <input type="text" class="datepicker" value="{{ yesterday }}">
     </div>
-    <button class="run-button" type="button" disabled="disabled">RUN</button>
+    <button class="run-button" type="button" disabled="disabled">LOAD</button>
   </div>
   <div class="table-container">
   </div>
@@ -118,6 +149,7 @@
     else {
       tableHtml = Mustache.render(tableTemplate, { ranges: ranges, websites: websites });
       $(TABLE_CONTAINER).empty().append($(tableHtml))
+      $(TABLE_CONTAINER).find(".product-choice").on("change", handlePartSelectionChange);
     }
   }
 
@@ -132,22 +164,30 @@
   function loadAllPartPrices() {
     $(".data-cell").text("");
     for (var i = 0; i < ranges.length; ++i) {
-      loadPartPrice(ranges[i]);
+      var rangeObj = ranges[i];
+      if (rangeObj.parts && rangeObj.parts.length) {
+        loadPartPrice(rangeObj.parts[0], rangeObj.range)
+      }
     }
   }
 
-  function loadPartPrice(rangeObj) {
-    if (rangeObj.parts && rangeObj.parts.length) {
-      getData("part/" + rangeObj.parts[0] + "/pricing_on_date?d=" + currentDate).done(function(data) {
-        console.log(data);
-        for (var website in data.by_website) {
-          var values = data.by_website[website];
-          for (var field in { "price": 1, "markup": 1, "rank": 1 }) {
-            $(".data-cell." + field + "[data-website='" + website + "'][data-range='" + rangeObj.range + "']").text(values[field]);
-          }
+  function loadPartPrice(partNumber, range) {
+    getData("part/" + partNumber + "/pricing_on_date?d=" + currentDate).done(function(data) {
+      for (var website in data.by_website) {
+        var values = data.by_website[website];
+        for (var field in { "price": 1, "markup": 1, "rank": 1 }) {
+          $(".data-cell." + field + "[data-website='" + website + "'][data-range='" + range + "']").text(values[field]);
         }
-      })
-    }
+      }
+    })
+  }
+
+  function handlePartSelectionChange() {
+    var target = $(this);
+    var partNumber = target.val();
+    var range = target.attr("data-range");
+    console.log(partNumber, range);
+    loadPartPrice(partNumber, range)
   }
 
   whenPageLoaded(function() {
