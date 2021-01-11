@@ -65,6 +65,14 @@ class Website(models.Model):
       verbose_name=_("is active"),
   )
 
+  # Distinguish test data.
+  for_testing = models.BooleanField(
+      blank=False,
+      null=False,
+      default=False,
+      verbose_name=_("for testing"),
+  )
+
   def __str__(self):
     return self.domain_name
 
@@ -134,6 +142,14 @@ class Part(models.Model):
       related_name="parts",
       to=Manufacturer,
       verbose_name=_("manufacturer"),
+  )
+
+  # Distinguish test data.
+  for_testing = models.BooleanField(
+      blank=False,
+      null=False,
+      default=False,
+      verbose_name=_("for testing"),
   )
 
   def __str__(self):
