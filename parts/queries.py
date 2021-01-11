@@ -1,6 +1,10 @@
+import logging
+
 from collections import OrderedDict
 
 from . import models
+
+logger = logging.getLogger(__name__)
 
 
 def get_websites(website_filters={}):
@@ -45,8 +49,9 @@ def get_part_pricing_on_date(part_filters, date):
     }
   """
   part = models.Part.objects.filter(**part_filters).get()
-  prices = models.PartPrice.objects.filter(part=part,
-                                           date=date).values("price", "website__domain_name")
+  prices = models.PartPrice.objects.filter(
+      part=part, date=date, website__manufacturers=part.manufacturer).distinct("website").values(
+          "price", "website__domain_name")
   prices = list(prices)
   prices = sorted(prices, key=lambda d: d.get("price"), reverse=True)
   cost = get_part_cost_for_date(part, date)
@@ -55,7 +60,7 @@ def get_part_pricing_on_date(part_filters, date):
     p = pe[1]
     p["rank"] = pe[0] + 1
     if cost:
-      p["markup"] = (p["price"] - cost.cost) / cost.cost
+      p["markup"] = round(((p["price"] - cost.cost) / cost.cost) * 100, 1)
     domain_name = p.pop("website__domain_name")
     by_website[domain_name] = p
 
