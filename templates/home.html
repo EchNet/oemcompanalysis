@@ -37,7 +37,14 @@
       <div class="modal-content">
         <div>
           {% for ws in websites %}
-            <div><span><input type="checkbox" {% if ws.excluded %}checked=checked{% endif %}><span class="website-label {% if ws.excluded %}strikethru{% endif %}">{{ws.domain_name}}</idv>
+            <div class="filter-website-row" data-id="{{ ws.id }}">
+              <span class="filter-website-checkbox">
+                <input type="checkbox" {% if ws.excluded %}checked=checked{% endif %}>
+              </span>
+              <span class="filter-website-label {% if ws.excluded %}strikethrough{% endif %}">
+                {{ws.domain_name}}
+              </span>
+            </div>
           {% endfor %}
         </div>
       </div>

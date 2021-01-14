@@ -28,11 +28,8 @@ class WebsiteView(generics.ListAPIView):
     q = Queries(self.request.user)
     m = self.request.GET.get("m", None)
     if m is not None:
-      q.website_filters = {
-          "manufacturers__id": m
-      } if m.isnumeric() else {
-          "manufacturers__name": m
-      }
+      return q.get_websites(
+          {"manufacturers__id": m} if m.isnumeric() else {"manufacturers__name": m})
     return q.get_websites()
 
 
@@ -156,8 +153,10 @@ class PartPricingOnDateView(views.APIView):
 class WebsiteExclusionView(views.APIView):
   def put(self, request):
     user = request.user
-    excluded_website_ids = request.GET.get("excluded_website_ids", [])
-    user.website_exclusions.set(excluded_website_ids)
+    excluded_website_ids = request.data.get("excluded_website_ids", [])
+    user.website_exclusions.all().delete()
+    for website_id in excluded_website_ids:
+      models.WebsiteExclusion.objects.create(user=user, website_id=website_id)
     return Response({"status": "OK"})
 
   def get(self, request):

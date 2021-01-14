@@ -52,3 +52,11 @@ tr.website-row:nth-child(odd) {
 .data-cell.rank {
   background-color: rgba(250,243,253,0.5);
 }
+.filter-website-row {
+  margin-top: 5px;
+  display: flex;
+  justify-content: left;
+}
+.filter-website-checkbox {
+  padding: 0 5px;
+}

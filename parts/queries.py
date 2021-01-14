@@ -1,6 +1,7 @@
 import logging
 
 from collections import OrderedDict
+from django.db.models import Case, IntegerField, When, Value
 
 from . import models
 
@@ -8,14 +9,20 @@ logger = logging.getLogger(__name__)
 
 
 class Queries:
-  website_filters = {}
-
   def __init__(self, user):
     self.user = user
 
-  def get_websites(self):
-    return models.Website.objects.filter(**self.website_filters).exclude(
+  def get_websites(self, website_filters={}):
+    return models.Website.objects.filter(**website_filters).exclude(
         exclusions__user=self.user).order_by("domain_name")
+
+  def get_all_websites(self):
+    return models.Website.objects.all() \
+        .values("domain_name", "id").order_by("domain_name") \
+        .annotate(excluded=Case(
+            When(exclusions__user=self.user, then=Value(1)),
+            default=0,
+            output_field=IntegerField()))
 
   def get_parts_per_cost_price_range(self, part_filters={}):
     """

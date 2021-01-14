@@ -14,6 +14,7 @@
   var MODAL_CLOSE_BUTTON = "button.modal-close-button";
   var MODAL_SCREEN = ".modal-screen";
   var MODAL_FRAME = ".modal-frame";
+  var WEBSITE_EXCLUDE_CHECKBOX = ".filter-website-checkbox input";
 
   // State
   var currentManufacturer;
@@ -22,14 +23,6 @@
   var websites = [];
   var ranges = [];
   var tableTemplate = null;
-
-  function showFilterWebsitesModal() {
-    $(FILTER_WEBSITES_MODAL).show()
-  }
-
-  function hideFilterWebsitesModal() {
-    $(FILTER_WEBSITES_MODAL).hide()
-  }
 
   function onFilterChange() {
     currentManufacturer = $(MANUFACTURER_SELECT).val();
@@ -110,8 +103,30 @@
     var target = $(this);
     var partNumber = target.val();
     var range = target.attr("data-range");
-    console.log(partNumber, range);
     loadPartPrice(partNumber, range)
+  }
+
+  function showFilterWebsitesModal() {
+    $(FILTER_WEBSITES_MODAL).show()
+  }
+
+  function hideFilterWebsitesModal() {
+    $(FILTER_WEBSITES_MODAL).hide()
+  }
+
+  function handleExcludeWebsite() {
+    $(this).closest(".filter-website-row").find(".filter-website-label")[ this.checked ? "addClass" : "removeClass" ]("strikethrough");
+    var excludedIds = [];
+    $(".filter-website-checkbox input:checked").each(function() {
+      excludedIds.push($(this).closest(".filter-website-row").attr("data-id"));
+    });
+    console.log(excludedIds);
+    putData("website_exclusions", { excluded_website_ids: excludedIds }).done(function() {
+      onFilterChange();
+      if (!!currentManufacturer && !!currentPartType) {
+        loadWebsites();
+      }
+    })
   }
 
   whenPageLoaded(function() {
@@ -126,7 +141,6 @@
     $(MODAL_CLOSE_BUTTON).on("click", hideFilterWebsitesModal)
     $(MODAL_SCREEN).on("click", hideFilterWebsitesModal)
     $(MODAL_FRAME).on("click", function(e) { e.stopPropagation(); })
+    $(WEBSITE_EXCLUDE_CHECKBOX).on("click", handleExcludeWebsite)
   })
 })();
-
-

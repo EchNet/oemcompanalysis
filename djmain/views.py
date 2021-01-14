@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 from rest_framework_jwt.settings import api_settings as jwt_api_settings
 
+from parts.queries import Queries
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,3 +35,12 @@ class PageView(TemplateView):
 
 class HomeView(PageView):
   template_name = "home.html"
+
+  def get_context_data(self, **kwargs):
+    websites = []
+    if not self.request.user.is_anonymous:
+      websites = Queries(self.request.user).get_all_websites()
+
+    context = super().get_context_data(**kwargs)
+    context.update({"websites": websites})
+    return context
