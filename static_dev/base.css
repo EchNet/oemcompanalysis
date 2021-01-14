@@ -77,3 +77,58 @@ input.link {
 .title {
   text-transform: capitalize;
 }
+.modal-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(96,96,96,0.5);
+  z-index: 2000000;
+  visibility: visible;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+.modal-frame {
+  position: relative;
+  width: 85%;
+  max-width: 400px;
+  height: 400px;
+  top: 50%;
+  padding: 3px;
+  text-align: center;
+  margin: auto;
+  margin-top: -150px;
+  border: solid 2px white;
+  background: white;
+  z-index: 2000001;
+  display: flex;
+  flex-flow: column;
+  border-radius: 8px;
+}
+.modal-header {
+  font-weight: 500;
+  font-size: 16px;
+}
+.modal-content {
+  overflow: scroll;
+  flex: 1 1 auto;
+}
+.modal-close-button {
+  font-family: sans-serif;
+  padding: 0 3px;
+  display: block;
+  font-size: 20px;
+  line-height: 20px;
+  position: absolute;
+  top: -11px;
+  right: -9px;
+  z-index: 2000002;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  background: black;
+  border: solid 2px white;
+  border-radius: 22px;
+}

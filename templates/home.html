@@ -24,11 +24,25 @@
     <div class="date-select-container">
       <input type="text" class="datepicker" value="{{ yesterday }}">
     </div>
+    <button class="filter-websites-button" type="button">Filter Websites</button>
     <button class="run-button" type="button" disabled="disabled">LOAD</button>
   </div>
   <div class="table-container">
   </div>
   <footer></footer>
+  <div id="filter-websites-modal" class="modal-screen" style="display: none;">
+    <div id="filter-websites-modal" class="modal-frame">
+      <button class="modal-close-button">×</button>
+      <div class="modal-header">Select websites to exclude</div>
+      <div class="modal-content">
+        <div>
+          {% for ws in websites %}
+            <div><span><input type="checkbox" {% if ws.excluded %}checked=checked{% endif %}><span class="website-label {% if ws.excluded %}strikethru{% endif %}">{{ws.domain_name}}</idv>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
 
 {% block load-last %}

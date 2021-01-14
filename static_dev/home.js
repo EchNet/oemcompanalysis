@@ -7,8 +7,13 @@
   var MANUFACTURER_SELECT = ".manufacturer-select-container select";
   var PARTTYPE_SELECT = ".parttype-select-container select";
   var RUN_BUTTON = "button.run-button";
+  var FILTER_WEBSITES_BUTTON = "button.filter-websites-button";
+  var FILTER_WEBSITES_MODAL = "#filter-websites-modal";
   var TABLE_CONTAINER = "div.table-container";
   var DATE_PICKER = "input.datepicker";
+  var MODAL_CLOSE_BUTTON = "button.modal-close-button";
+  var MODAL_SCREEN = ".modal-screen";
+  var MODAL_FRAME = ".modal-frame";
 
   // State
   var currentManufacturer;
@@ -17,6 +22,14 @@
   var websites = [];
   var ranges = [];
   var tableTemplate = null;
+
+  function showFilterWebsitesModal() {
+    $(FILTER_WEBSITES_MODAL).show()
+  }
+
+  function hideFilterWebsitesModal() {
+    $(FILTER_WEBSITES_MODAL).hide()
+  }
 
   function onFilterChange() {
     currentManufacturer = $(MANUFACTURER_SELECT).val();
@@ -108,7 +121,11 @@
     $(PARTTYPE_SELECT).on("change", onFilterChange)
     $(MANUFACTURER_SELECT).on("change", onFilterChange)
     $(DATE_PICKER).on("change", onFilterChange)
+    $(FILTER_WEBSITES_BUTTON).on("click", showFilterWebsitesModal)
     $(RUN_BUTTON).on("click", loadWebsites)
+    $(MODAL_CLOSE_BUTTON).on("click", hideFilterWebsitesModal)
+    $(MODAL_SCREEN).on("click", hideFilterWebsitesModal)
+    $(MODAL_FRAME).on("click", function(e) { e.stopPropagation(); })
   })
 })();
 
