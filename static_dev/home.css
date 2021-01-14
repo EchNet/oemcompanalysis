@@ -1,0 +1,54 @@
+body {
+  font-size: 12px;
+}
+div.top-controls {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 12px;
+  border-bottom: ridge 3px #ca2;
+  background-color: #efb02a;
+}
+select {
+  padding: 3px;
+}
+select, option {
+  font-size: 12px;
+}
+input.datepicker {
+  width: 110px;
+  padding: 0 5px;
+}
+body {
+  width: 100%;
+}
+div.table-container {
+  overflow-x: scroll;
+  padding: 12px;
+}
+tr.range-subheader-row {
+  border-bottom: solid 1px #ca2;
+}
+tr.website-row:nth-child(odd) {
+  background-color: #f0f0f0;
+}
+.data-cell {
+  text-align: right;
+  padding: 2px 3px 2px 0;
+}
+.website-header {
+  text-align: center;
+  padding: 2px 3px;
+}
+.website-header, .data-cell.rank {
+  border-right: solid 3px white;
+}
+.data-cell.price {
+  background-color: rgba(255,248,243,0.5);
+}
+.data-cell.markup {
+  background-color: rgba(243,255,248,0.5);
+}
+.data-cell.rank {
+  background-color: rgba(250,243,253,0.5);
+}

@@ -1,0 +1,79 @@
+ul.errorlist {
+  list-style: none;
+}
+ul.errorlist li {
+  color: red;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #666;
+  color: white;
+  border-bottom: solid 1px #555;
+  font-size: 16px;
+}
+header a {
+  color: white;
+  text-decoration: none;
+}
+header a:hover {
+  color: #bbb;
+  text-decoration: underline;
+}
+header .welcome {
+  color: #dd6;
+}
+section {
+  margin: 6px;
+}
+select, option {
+  font-size: 20px;
+}
+div.card {
+  margin: 10px;
+  padding: 20px;
+  border: solid 1px #ddd;
+}
+.screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(169,169,169,0.5);
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+button.close {
+  position: absolute;
+  padding: 0 4px;
+  background: white;
+  color: black;
+  border: none;
+  font-Size: 16px;
+  font-Family: Arial;
+  height: 25px;
+  top: 6px;
+  right: 6px;
+  border-Radius: 4px;
+  border: solid 1px white;
+}
+input.link {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  font-family: arial, sans-serif;
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.error {
+  color: #c00;
+}
+.upper {
+  text-transform: uppercase;
+}
+.title {
+  text-transform: capitalize;
+}

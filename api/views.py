@@ -7,7 +7,8 @@ from rest_framework import generics, serializers, views
 from rest_framework.response import Response
 
 from api import serializers as serializers
-from parts import models, queries, tasks
+from parts import models, tasks
+from parts.queries import Queries
 from utils.csv import render_to_response_as_csv
 
 logger = logging.getLogger(__name__)
@@ -24,14 +25,15 @@ class WebsiteView(generics.ListAPIView):
   serializer_class = serializers.WebsiteSerializer
 
   def get_queryset(self):
-    filters = {}
+    q = Queries(self.request.user)
     m = self.request.GET.get("m", None)
     if m is not None:
-      if m.isnumeric():
-        filters["manufacturers__id"] = m
-      else:
-        filters["manufacturers__name"] = m
-    return queries.get_websites(filters)
+      q.website_filters = {
+          "manufacturers__id": m
+      } if m.isnumeric() else {
+          "manufacturers__name": m
+      }
+    return q.get_websites()
 
 
 class PartsView(views.APIView):
@@ -135,7 +137,7 @@ class PartsPerCostPriceRangeView(views.APIView):
       if t not in [c[0] for c in models.PartType.CHOICES]:
         raise serializers.ValidationError(f"{t}: invalid part type")
       part_filters["part_type"] = t
-    return Response(queries.get_parts_per_cost_price_range(part_filters))
+    return Response(Queries(request.user).get_parts_per_cost_price_range(part_filters))
 
 
 class PartPricingOnDateView(views.APIView):
@@ -146,6 +148,19 @@ class PartPricingOnDateView(views.APIView):
       date = datetime.strptime(d, "%Y-%m-%d").date()
     else:
       date = (timezone.now() - timedelta(days=1)).date()
-    result = queries.get_part_pricing_on_date(part_filters, date)
+    result = Queries(request.user).get_part_pricing_on_date(part_filters, date)
     logger.info(f"Part filters={part_filters} date={date}: result={result}")
     return Response(result)
+
+
+class WebsiteExclusionView(views.APIView):
+  def put(self, request):
+    user = request.user
+    excluded_website_ids = request.GET.get("excluded_website_ids", [])
+    user.website_exclusions.set(excluded_website_ids)
+    return Response({"status": "OK"})
+
+  def get(self, request):
+    user = request.user
+    excluded_website_ids = user.website_exclusions.all().values_list("website_id", flat=True)
+    return Response({"user": user.id, "excluded_website_ids": excluded_website_ids})

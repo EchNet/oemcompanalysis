@@ -209,6 +209,31 @@ class PartPrice(models.Model):
     return self.part.part_number
 
 
+class WebsiteExclusion(models.Model):
+
+  # The owner of this filter.
+  user = models.ForeignKey(
+      blank=False,
+      db_index=True,
+      null=False,
+      on_delete=models.CASCADE,
+      related_name="website_exclusions",
+      to=get_user_model(),
+      verbose_name=_("user"),
+  )
+
+  # The website to exclude.
+  website = models.ForeignKey(
+      blank=False,
+      db_index=True,
+      null=False,
+      on_delete=models.CASCADE,
+      related_name="exclusions",
+      to=Website,
+      verbose_name=_("website"),
+  )
+
+
 class PartCostPoint(models.Model):
   """
     Cost of a part on a particular date and forward.

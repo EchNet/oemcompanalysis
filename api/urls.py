@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^parts/per_cost_price_range/?$', api_views.PartsPerCostPriceRangeView.as_view()),
     url(r'^part/(?P<part_number>[^/]+)/pricing_on_date',
         api_views.PartPricingOnDateView.as_view()),
+    url(r'^website_exclusions/?$', api_views.WebsiteExclusionView.as_view()),
 ]
