@@ -8,21 +8,28 @@ from . import models
 logger = logging.getLogger(__name__)
 
 
+class AnnotatedWebsite:
+  def __init__(self, website, user):
+    self.id = website.id
+    self.domain_name = website.domain_name
+    self.excluded = models.WebsiteExclusion.objects.filter(website=website, user=user).exists()
+    self.manufacturers = (m for m in website.manufacturers.all())
+
+
 class Queries:
   def __init__(self, user):
     self.user = user
+
+  def get_manufacturers(self):
+    return models.Manufacturer.objects.all().order_by("name")
 
   def get_websites(self, website_filters={}):
     return models.Website.objects.filter(**website_filters).exclude(
         exclusions__user=self.user).order_by("domain_name")
 
-  def get_all_websites(self):
-    return models.Website.objects.all() \
-        .values("domain_name", "id").order_by("domain_name") \
-        .annotate(excluded=Case(
-            When(exclusions__user=self.user, then=Value(1)),
-            default=0,
-            output_field=IntegerField()))
+  def get_annotated_websites(self):
+    return (AnnotatedWebsite(w, self.user)
+            for w in models.Website.objects.all().order_by("domain_name"))
 
   def get_parts_per_cost_price_range(self, part_filters={}):
     """

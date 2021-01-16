@@ -12,6 +12,9 @@
     <div class="manufacturer-select-container">
       <select>
         <option value=''>Select a manufacturer</option>
+        {% for m in manufacturers %}
+          <option value ='{{m.id}}'>{{m.name}}</option>
+        {% endfor %}
       </select>
     </div>
     <div class="parttype-select-container">
@@ -25,10 +28,10 @@
       <input type="text" class="datepicker" value="{{ yesterday }}">
     </div>
     <button class="filter-websites-button" type="button">Filter Websites</button>
-    <button class="run-button" type="button" disabled="disabled">LOAD</button>
   </div>
   <div class="table-container">
   </div>
+  <div class="website-count-message small" style="padding-left: 10px;"></div>
   <footer></footer>
   <div id="filter-websites-modal" class="modal-screen" style="display: none;">
     <div id="filter-websites-modal" class="modal-frame">
@@ -37,7 +40,8 @@
       <div class="modal-content">
         <div>
           {% for ws in websites %}
-            <div class="filter-website-row" data-id="{{ ws.id }}">
+            <div class="filter-website-row{% for m in ws.manufacturers %} manufacturer-{{ m.id }}{% endfor %}"
+                data-id="{{ ws.id }}">
               <span class="filter-website-checkbox">
                 <input type="checkbox" {% if ws.excluded %}checked=checked{% endif %}>
               </span>

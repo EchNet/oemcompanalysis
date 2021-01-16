@@ -32,28 +32,58 @@
     websites = []
     ranges = []
     renderTable()
+    renderWebsiteCountMessage(null)
 
-    if (!!currentManufacturer && !!currentPartType) {
-      $(RUN_BUTTON).removeAttr("disabled");
+    if (!!currentManufacturer) {
+      $(".filter-website-row").hide();
+      $(".filter-website-row.manufacturer-" + currentManufacturer).show();
     }
     else {
-      $(RUN_BUTTON).attr("disabled", "disabled");
+      $(".filter-website-row").show();
+    }
+
+    if (!!currentManufacturer && !!currentPartType) {
+      reloadReport();
     }
   }
 
-  function renderManufacturerSelect(select, data) {
-    const TEMPLATE = "<option value ='{{id}}'>{{name}}</option>";
-    for (var i = 0; i < data.length; ++i) {
-      select.append($(Mustache.render(TEMPLATE, data[i])))
-    }
-  }
-
-  function loadWebsites() {
+  function reloadReport() {
+    // Start by querying for the websites for the selected manufacturer.
     getData("website?m=" + currentManufacturer).done(function(data) {
       websites = data;
       renderTable()
       loadPartsPerCostPriceRange()
+      renderWebsiteCountMessage(currentManufacturer)
     })
+  }
+
+  function renderWebsiteCountMessage(currentManufacturer) {
+    var websiteCountMessage = ""
+    if (!!currentManufacturer) {
+      console.log(currentManufacturer, 'curman');
+      var showingCount = websites.length;
+      console.log(showingCount, 'showingCount');
+      var fullCount = countWebsitesForManufacturer();
+      console.log(fullCount, 'fullCount');
+      var manufacturerName = $(MANUFACTURER_SELECT + " option:selected").text();
+      if (showingCount < fullCount) {
+        websiteCountMessage = "<span>Showing <b>" + showingCount + "</b> of <b>" +
+            fullCount + "</b> " + manufacturerName + " websites.</span>";
+        console.log(websiteCountMessage);
+      }
+    }
+    console.log($(".website-count-message"))
+    $(".website-count-message").html(websiteCountMessage);
+  }
+
+  function countWebsitesForManufacturer() {
+    var count = 0;
+    $(".filter-website-row").each(function() {
+      if ($(this).hasClass("manufacturer-" + currentManufacturer)) {
+        count += 1;
+      }
+    });
+    return count;
   }
 
   function renderTable() {
@@ -120,24 +150,16 @@
     $(".filter-website-checkbox input:checked").each(function() {
       excludedIds.push($(this).closest(".filter-website-row").attr("data-id"));
     });
-    console.log(excludedIds);
     putData("website_exclusions", { excluded_website_ids: excludedIds }).done(function() {
       onFilterChange();
-      if (!!currentManufacturer && !!currentPartType) {
-        loadWebsites();
-      }
     })
   }
 
   whenPageLoaded(function() {
-    getData("manufacturer").done(function(data) {
-      renderManufacturerSelect($(MANUFACTURER_SELECT), data)
-    })
     $(PARTTYPE_SELECT).on("change", onFilterChange)
     $(MANUFACTURER_SELECT).on("change", onFilterChange)
     $(DATE_PICKER).on("change", onFilterChange)
     $(FILTER_WEBSITES_BUTTON).on("click", showFilterWebsitesModal)
-    $(RUN_BUTTON).on("click", loadWebsites)
     $(MODAL_CLOSE_BUTTON).on("click", hideFilterWebsitesModal)
     $(MODAL_SCREEN).on("click", hideFilterWebsitesModal)
     $(MODAL_FRAME).on("click", function(e) { e.stopPropagation(); })

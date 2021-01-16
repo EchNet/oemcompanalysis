@@ -37,10 +37,11 @@ class HomeView(PageView):
   template_name = "home.html"
 
   def get_context_data(self, **kwargs):
+    manufacturers = Queries(self.request.user).get_manufacturers()
     websites = []
     if not self.request.user.is_anonymous:
-      websites = Queries(self.request.user).get_all_websites()
+      websites = Queries(self.request.user).get_annotated_websites()
 
     context = super().get_context_data(**kwargs)
-    context.update({"websites": websites})
+    context.update({"manufacturers": manufacturers, "websites": websites})
     return context
