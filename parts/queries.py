@@ -12,7 +12,8 @@ class AnnotatedWebsite:
   def __init__(self, website, user):
     self.id = website.id
     self.domain_name = website.domain_name
-    self.excluded = models.WebsiteExclusion.objects.filter(website=website, user=user).exists()
+    self.excluded = (user.is_authenticated and models.WebsiteExclusion.objects.filter(
+        website=website, user=user).exists())
     self.manufacturers = (m for m in website.manufacturers.all())
 
 
@@ -24,8 +25,10 @@ class Queries:
     return models.Manufacturer.objects.all().order_by("name")
 
   def get_websites(self, website_filters={}):
-    return models.Website.objects.filter(**website_filters).exclude(
-        exclusions__user=self.user).order_by("domain_name")
+    q = models.Website.objects.filter(**website_filters).order_by("domain_name")
+    if self.user.is_authenticated:
+      q = q.exclude(exclusions__user=self.user)
+    return q
 
   def get_annotated_websites(self):
     return (AnnotatedWebsite(w, self.user)
@@ -68,10 +71,12 @@ class Queries:
       }
     """
     part = models.Part.objects.filter(**part_filters).get()
-    prices = models.PartPrice.objects.filter(
-        part=part, date=date, website__manufacturers=part.manufacturer).exclude(
-            website__exclusions__user=self.user).distinct("website").values(
-                "price", "website__domain_name")
+    prices = models.PartPrice.objects.filter(part=part,
+                                             date=date,
+                                             website__manufacturers=part.manufacturer)
+    if self.user.is_authenticated:
+      prices = prices.exclude(website__exclusions__user=self.user)
+    prices = prices.distinct("website").values("price", "website__domain_name")
     prices = list(prices)
     prices = sorted(prices, key=lambda d: d.get("price"), reverse=True)
     cost = self.get_part_cost_for_date(part, date)

@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
 from django.utils import dateformat, timezone
-from rest_framework import generics, serializers, views
+from rest_framework import generics, mixins, serializers, views
 from rest_framework.response import Response
 
 from api import serializers as serializers
@@ -21,8 +21,14 @@ class ManufacturerView(generics.ListAPIView):
     return models.Manufacturer.objects.all().order_by("name")
 
 
-class WebsiteView(generics.ListAPIView):
+class WebsiteView(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
   serializer_class = serializers.WebsiteSerializer
+
+  def get(self, request, *args, **kwargs):
+    return self.list(request, *args, **kwargs)
+
+  def post(self, request, *args, **kwargs):
+    return self.create(request, *args, **kwargs)
 
   def get_queryset(self):
     q = Queries(self.request.user)
