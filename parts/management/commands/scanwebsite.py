@@ -1,5 +1,6 @@
 import requests
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from parts import models
@@ -19,13 +20,17 @@ class Command(BaseCommand):
         raise CommandError(f"{domain}: no such website")
       self.stdout.write(self.style.SUCCESS(f"{domain} : scanning"))
       try:
-        results = Command.scan_domain(domain)
+        info = Command.scan_domain(domain)
       except requests.exceptions.HTTPError:
         raise CommandError(f"{domain}: HTTP error")
-      self.stdout.write(self.style.SUCCESS(f"{domain} : {str(results)}"))
+      self.stdout.write(self.style.SUCCESS(f"{domain} : {str(info)}"))
+      if info:
+        Command.apply_domain_info_to_website(info, website)
 
   @staticmethod
   def scan_domain(domain_name):
+    if settings.DEBUG:
+      return {"manufacturers": ["Buick", "Volkswagen"]}
     r = requests.get(f"https://www.{domain_name}/ajax/vehicle-picker/makes/all", timeout=1)
     r.raise_for_status()
     try:
@@ -33,3 +38,10 @@ class Command(BaseCommand):
     except Exception:
       return None
     return {"manufacturers": [obj["ui"] for obj in rj]}
+
+  @staticmethod
+  def apply_domain_info_to_website(info, website):
+    if "manufacturers" in info:
+      for m in info["manufacturers"]:
+        manufacturer, created = models.Manufacturer.objects.get_or_create(name=m)
+        website.manufacturers.add(manufacturer)
