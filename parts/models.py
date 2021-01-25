@@ -39,7 +39,9 @@ class Website(models.Model):
                                  verbose_name=_("domain name"))
 
   # A site can sell parts from multiple manufacturers.
-  manufacturers = models.ManyToManyField(to=Manufacturer, verbose_name=_("manufacturers"))
+  manufacturers = models.ManyToManyField(to=Manufacturer,
+                                         blank=True,
+                                         verbose_name=_("manufacturers"))
 
   # Is this site an OEM client?
   is_client = models.BooleanField(
