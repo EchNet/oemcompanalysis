@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     "widget_tweaks",
     "corsheaders",
     "rest_framework",
+    "rest_framework_api_key",
     "rest_framework_swagger",
     'import_export',
 
@@ -248,7 +249,7 @@ AWS_DEFAULT_ACL = "private"
 # rest_framework
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "api.permissions.DEFAULT_PERMISSIONS",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_jwt.authentication.JSONWebTokenAuthentication",

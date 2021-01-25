@@ -16,6 +16,7 @@ django-storages
 django-widget-tweaks
 djangorestframework
 djangorestframework-jwt
+djangorestframework-api-key
 dj-database-url
 gunicorn
 psycopg2-binary
