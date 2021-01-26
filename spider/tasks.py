@@ -3,7 +3,6 @@ import logging
 from celery import shared_task
 from django.utils import timezone
 
-from . import models, services
 from parts import models as parts_models
 from parts.management.commands.scanwebsite import Command as ScanWebsiteCommand
 from parts.management.commands.getpartprice import Command as GetPartPriceCommand
@@ -18,7 +17,7 @@ COUNTDOWN_INCREMENT = 1
 def run_full_scrape():
   logger.info("run_full_scrape: START")
   countdown = COUNTDOWN_INCREMENT
-  for website in models.Website.objects.filter(is_active=True, for_testing=False):
+  for website in parts_models.Website.objects.filter(is_active=True, for_testing=False):
     logger.debug(f"delay run_website_scan({website})")
     run_website_scan.apply_async(args=[website.id], countdown=countdown)
     countdown += COUNTDOWN_INCREMENT
