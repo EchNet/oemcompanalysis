@@ -47,7 +47,7 @@ class Command(BaseCommand):
     if settings.DEBUG:
       return {"price": 40}
     return Command.scan_url_for_part_price(
-        f"https://www.{domain_name}/search?search_str={part.part_number}")
+        f"https://www.{website.domain_name}/search?search_str={part.part_number}")
 
   @staticmethod
   def scan_url_for_part_price(url):
