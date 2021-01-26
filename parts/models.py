@@ -154,6 +154,14 @@ class Part(models.Model):
       verbose_name=_("for testing"),
   )
 
+  # Do maintain pricing information for this part.
+  is_active = models.BooleanField(
+      blank=False,
+      null=False,
+      default=True,
+      verbose_name=_("is active"),
+  )
+
   def __str__(self):
     return self.part_number
 
