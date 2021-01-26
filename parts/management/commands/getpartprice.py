@@ -24,7 +24,7 @@ class Command(BaseCommand):
       except models.Website.DoesNotExist:
         raise CommandError(f"{domain}: no such website")
 
-      part_number = options["part_number"][0]
+      part_number = options["part_number"]
       try:
         part = models.Part.objects.filter(part_number=part_number).get()
       except models.Part.DoesNotExist:
