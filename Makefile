@@ -1,10 +1,8 @@
 # Make commands for development
 # 
-# `make djsetup` install required Python modules.
-# `make djbuild` generates required migrations.
-# `make djtest` runs automated Python tests.
-#
-# `make djrun` runs the Django server, listening on port 8000.
+# `make build` installs required modules and generates required migrations.
+# `make test` runs automated Python tests.
+# `make run` runs the Django server, listening on port 8000.
 # `make celery` runs a Celery worker.  Needs to be restarted manually when code changes.
 
 PIP=pip
@@ -22,17 +20,17 @@ requirements.flag: requirements.txt
 	$(PIP) install -r requirements.txt
 	touch requirements.flag
 
-djbuild: requirements.flag
+build: requirements.flag
 	$(PYTHON) ./manage.py makemigrations
 
-djtest: djbuild
+test: build
 	$(PYTHON) ./manage.py test ./djmain/tests
 
-djrun: djbuild
+run: build
 	$(PYTHON) ./manage.py migrate
 	$(PYTHON) ./manage.py runserver
 
-celery: djbuild
+celery: build
 	$(CELERY) -A djmain worker --loglevel=debug
 
 clean:
