@@ -29,9 +29,22 @@ class Command(BaseCommand):
 
   @staticmethod
   def scan_domain(domain_name):
-    if settings.DEBUG:
-      return {"manufacturers": ["Buick", "Volkswagen"]}
-    r = requests.get(f"https://www.{domain_name}/ajax/vehicle-picker/makes/all", timeout=1)
+    #if settings.DEBUG: return {"manufacturers": ["Buick", "Volkswagen"]}
+    headers = {
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "en-US;q=0.9,en;q=0.8",
+        "cache-control": "no-cache",
+        "pragma": "no-cache",
+        "referer": f"https://www.{domain_name}/",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "user-agent": "oeminteractive.com",
+    }
+    r = requests.get(f"https://www.{domain_name}/ajax/vehicle-picker/makes/all",
+                     timeout=1,
+                     headers=headers)
     r.raise_for_status()
     try:
       rj = r.json()
