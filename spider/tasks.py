@@ -1,4 +1,5 @@
 import logging
+import requests
 
 from celery import shared_task
 from django.utils import timezone
@@ -30,10 +31,16 @@ def run_website_scan(website_id):
   # Update the website's status and set of manufacturers.
   logger.info(f"run_website_scan({website_id}): START")
   website = parts_models.Website.objects.get(id=website_id)
-  info = ScanWebsiteCommand.scan_domain(website.domain_name)
-  logger.debug(f"run_website_scan: website={website} info={str(info)}")
+  info = None
+  try:
+    info = ScanWebsiteCommand.scan_website(website)
+  except requests.exceptions.SSLError:
+    logger.debug(f"run_website_scan: website={website} is not active")
+    website.is_active = False
+    website.save()
   if info:
-    ScanWebsiteCommand.apply_domain_info_to_website(info, website)
+    logger.debug(f"run_website_scan: website={website} info={str(info)}")
+    ScanWebsiteCommand.apply_info_to_website(info, website)
   logger.info(f"run_website_scan({website_id}): DONE")
 
 
@@ -41,7 +48,7 @@ def run_website_scan(website_id):
 def run_full_prices_scrape():
   logger.info("run_full_prices_scrape: START")
   countdown = COUNTDOWN_INCREMENT
-  for part in Part.objects.filter(is_active=True, for_testing=False):
+  for part in parts_models.Part.objects.filter(is_active=True, for_testing=False):
     logger.debug(f"delay run_parts_prices_scrape({part})")
     run_part_prices_scrape.apply_async(args=[part.id], countdown=countdown)
     countdown += COUNTDOWN_INCREMENT
@@ -53,7 +60,7 @@ def run_part_prices_scrape(part_id):
   # Find prices for this part on websites that might carry it.
   logger.info(f"run_part_prices_scrape({part_id}): START")
   part = parts_models.Part.objects.get(id=part_id)
-  for website in Website.objects.filter(manufacturers=part.manufacturer):
+  for website in parts_models.Website.objects.filter(manufacturers=part.manufacturer):
     try:
       info = GetPartPriceCommand.search_website_for_part_price(website, part)
       logger.debug(f"run_part_prices_scrape: website={website} part={part} info={str(info)}")

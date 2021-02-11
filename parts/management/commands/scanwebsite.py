@@ -15,21 +15,30 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     for domain in options["domain"]:
-      try:
-        website = models.Website.objects.filter(domain_name=domain).get()
-      except models.Website.DoesNotExist:
-        raise CommandError(f"{domain}: no such website")
       self.stdout.write(self.style.SUCCESS(f"{domain} : scanning"))
-      try:
-        info = RevolutionPartsScanner(domain).scan_domain()
-      except requests.exceptions.HTTPError:
-        raise CommandError(f"{domain}: HTTP error")
-      self.stdout.write(self.style.SUCCESS(f"{domain} : {str(info)}"))
-      if info:
-        Command.apply_domain_info_to_website(info, website)
+      Command.scan_domain(domain)
 
   @staticmethod
-  def apply_domain_info_to_website(info, website):
+  def scan_domain(domain):
+    try:
+      website = models.Website.objects.filter(domain_name=domain).get()
+    except models.Website.DoesNotExist:
+      raise CommandError(f"{domain}: no such website")
+    info = Command.scan_website(website)
+    if info:
+      Command.apply_info_to_website(info, website)
+
+  @staticmethod
+  def scan_website(website):
+    try:
+      domain = website.domain_name
+      info = RevolutionPartsScanner(domain).scan_domain()
+      return info
+    except requests.exceptions.HTTPError:
+      raise CommandError(f"{domain}: HTTP error")
+
+  @staticmethod
+  def apply_info_to_website(info, website):
     if "manufacturers" in info:
       for m in info["manufacturers"]:
         manufacturer, created = models.Manufacturer.objects.get_or_create(name=m)
