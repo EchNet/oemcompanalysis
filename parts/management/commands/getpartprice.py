@@ -4,9 +4,9 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
-from lxml import html
 
 from parts import models
+from spider.revolution import RevolutionPartsScanner
 
 
 class Command(BaseCommand):
@@ -44,23 +44,7 @@ class Command(BaseCommand):
 
   @staticmethod
   def search_website_for_part_price(website, part):
-    if settings.DEBUG:
-      return {"price": 40}
-    return Command.scan_url_for_part_price(
-        f"https://www.{website.domain_name}/search?search_str={part.part_number}")
-
-  @staticmethod
-  def scan_url_for_part_price(url):
-    r = requests.get(url, timeout=5)
-    r.raise_for_status()
-    htmldoc = html.fromstring(r.content)
-    prices = htmldoc.xpath('//span[contains(@class,"sale-price-amount")]/text()')
-    print(prices)
-    if prices:
-      price = prices[0].replace("$", "")
-      return {"price": price}
-    else:
-      return {"message": "No price found in page."}
+    return RevolutionPartsScanner(website.domain_name).search_for_part_price(part.part_number)
 
   @staticmethod
   def record_part_price(info, website, part):

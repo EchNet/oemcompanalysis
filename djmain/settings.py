@@ -18,6 +18,7 @@ DEMO = config("DEMO", cast=bool, default=False)
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 SITE_URL = config("SITE_URL")
 ALLOWED_HOSTS = ["*"]
+PROXY_URL = config("PROXY_URL", None)
 
 # Web server
 USE_X_FORWARDED_PORT = True
